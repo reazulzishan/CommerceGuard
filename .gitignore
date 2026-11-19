@@ -20,3 +20,4 @@ recording/*.log
 video/.thumbnails/
 video/.waveform-cache/
 video/assets/music/*.wav
+data/raw_ep2/
