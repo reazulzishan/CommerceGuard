@@ -19,3 +19,4 @@ recording/*.log
 *.log
 video/.thumbnails/
 video/.waveform-cache/
+video/assets/music/*.wav

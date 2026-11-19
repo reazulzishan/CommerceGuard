@@ -44,7 +44,7 @@ def at(sid, token, nth=0, default=None):
     return round(LEAD + (SCENES.get(sid) or OUTROS[sid])["dur"] * 0.5, 2)
 
 
-HOLD = {"S24": 1.2, "S25": 0.8, "S28": 0.8, "S31": 1.5, "C03": 0.8, "C08": 1.0, "C06": 0.4}
+HOLD = {"S11": 0.8, "S24": 1.2, "S25": 0.8, "S28": 0.8, "S31": 1.5, "C03": 0.8, "C08": 1.0, "C06": 0.4}
 
 
 def dur(sid):
@@ -292,6 +292,36 @@ def code_scene(sc, key):
 TYPING = {}
 
 
+# ---------------------------------------------------------------- glass, aura, sweep
+def aura(sc, cols=(AMB, GRN), seed=0):
+    """Two soft colour fields drifting behind glass so the glass has something to refract."""
+    W, H, u = sc.W, sc.H, sc.u
+    d = dur(sc.sid)
+    spots = [(0.22, 0.30), (0.78, 0.70)] if not sc.P else [(0.25, 0.25), (0.75, 0.62)]
+    for i, (fx, fy) in enumerate(spots):
+        el = sc.id(f"aura{i}")
+        r = (520 if not sc.P else 600) * u
+        sc.add(f'<div id="{el}"></div>', f"#{el}{{position:absolute;left:{W * fx - r / 2}px;top:{H * fy - r / 2}px;width:{r}px;height:{r}px;border-radius:50%;"
+               f"background:{cols[i % len(cols)]};opacity:.16;filter:blur({110 * u}px);}}")
+        dx, dy = (90 if i == 0 else -80) * u, (-50 if i == 0 else 60) * u
+        sc.js.append(f'tl.fromTo("#{el}",{{x:0,y:0}},{{x:{dx},y:{dy},duration:{d:.2f},ease:"sine.inOut"}},0);')
+
+
+GLASS = ("background:rgba(255,255,255,.07);border:{b}px solid rgba(255,255,255,.18);backdrop-filter:blur({bl}px);-webkit-backdrop-filter:blur({bl}px);"
+         "box-shadow:inset 0 1px 0 rgba(255,255,255,.22),0 24px 60px rgba(0,0,0,.45);border-radius:{r}px;")
+
+
+def glass(sc):
+    return GLASS.format(b=max(1, round(1.5 * sc.u)), bl=round(18 * sc.u), r=round(20 * sc.u))
+
+
+def sweep(sc, el, t):
+    """A single light sweep across a headline (background-clip text)."""
+    sc.css.append(f"#{el} span{{background-image:linear-gradient(100deg,currentColor 0%,currentColor 42%,#FFFFFF 50%,currentColor 58%,currentColor 100%);"
+                  f"background-size:300% 100%;background-position:100% 0;-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;}}")
+    sc.js.append(f'tl.fromTo("#{el} span",{{backgroundPosition:"100% 0"}},{{backgroundPosition:"0% 0",duration:1.3,ease:"power2.inOut"}},{t:.2f});')
+
+
 # ---------------------------------------------------------------- the scenes
 def S(sid, W, H):
     sc = Scene(sid, W, H); u, P = sc.u, sc.P
@@ -305,7 +335,7 @@ def S(sid, W, H):
         for i in range(n):
             el = sc.id(f"p{i}")
             x = L + i * ((W - 2 * L) / n) if not P else L + (i % 3) * (W - 2 * L) / 3
-            y = H * 0.40 if not P else H * 0.30 + (i // 3) * 260 * u
+            y = H * 0.30 if not P else H * 0.22 + (i // 3) * 190 * u
             sc.add(f'<div id="{el}" class="parcel"><div class="tape"></div></div>',
                    f"#{el}{{position:absolute;left:{x}px;top:{y}px;}}")
             sc.js.append(f'tl.fromTo("#{el}",{{opacity:0,y:{-60 * u}}},{{opacity:1,y:0,duration:.45,ease:"power3.out"}},{0.3 + i * 0.25:.2f});')
@@ -315,10 +345,24 @@ def S(sid, W, H):
         for j, (txt, tok, pi) in enumerate(tags):
             t = at(sid, tok)
             x = L + pi * ((W - 2 * L) / n) if not P else L + (pi % 3) * (W - 2 * L) / 3
-            y = H * 0.40 if not P else H * 0.30 + (pi // 3) * 260 * u
+            y = H * 0.30 if not P else H * 0.22 + (pi // 3) * 190 * u
             sc.js.append(f'tl.to("#{sc.id(f"p{pi}")}",{{backgroundColor:"{RED}",duration:.3}},{t});')
-            label(sc, f"t{j}", txt, x + 85 * u, y + (180 if j % 2 == 0 else -70) * u, size=30, color=RED, t=t, anchor="center")
+            if not P:
+                label(sc, f"t{j}", txt, x + 85 * u, y + (165 if j % 2 == 0 else -55) * u, size=30, color=RED, t=t, anchor="center")
+            elif j == 1:
+                label(sc, f"t{j}", "✕ " + txt, L, H * 0.505, size=34, color=RED, t=t, weight=800)
         label(sc, "every", "Thousands of orders, every day", L, H * (0.18 if not P else 0.16), size=56, t=at(sid, "every"), weight=800)
+        photos = [("boxes.jpg", "Left at the door, refused", "reject"), ("refund.jpg", "Returned, refunded, profit gone", "refunds")]
+        cw = W * (0.30 if not P else 0.42)
+        for j, (img, cap, tok) in enumerate(photos):
+            el = sc.id(f"ph{j}")
+            x = L if j == 0 else W - L - cw
+            y = H * (0.54 if not P else 0.56)
+            ih = H * (0.22 if not P else 0.15)
+            sc.add(f'<div id="{el}" class="ph"><img src="assets/photos/{img}"/><div>{cap}</div></div>', f"#{el}{{left:{x}px;top:{y}px;width:{cw}px;}}#{el} img{{height:{ih}px;}}")
+            sc.js.append(f'tl.fromTo("#{el}",{{opacity:0,y:{40 * u},rotation:{-3 if j == 0 else 3}}},{{opacity:1,y:0,rotation:{-1.5 if j == 0 else 1.5},duration:.6,ease:"power3.out"}},{at(sid, tok) + 0.2:.2f});')
+        sc.css.append(f"#root .ph{{position:absolute;padding:{12 * u}px;{glass(sc)}}}#root .ph img{{width:100%;object-fit:cover;border-radius:{10 * u}px;display:block;}}"
+                      f"#root .ph div{{font-size:{32 * u}px;font-weight:800;color:{RED};margin-top:{10 * u}px;}}")
     elif sid == "S03":
         kinetic(sc, [("Most businesses find out", 0.3, INK), ("after the damage is done.", at(sid, "after"), RED),
                      ("What if we saw the warning signs earlier?", at(sid, "warning"), AMB)], size=86)
@@ -327,7 +371,9 @@ def S(sid, W, H):
         sc.add(f'<div id="{el}"><span>Commerce</span><span style="color:{AMB}">Guard</span></div>',
                f"#{el}{{position:absolute;left:0;right:0;top:{H * (0.30 if not P else 0.28)}px;text-align:center;font-weight:800;"
                f"font-size:{(150 if not P else 118) * u}px;letter-spacing:-0.04em;clip-path:inset(0 100% 0 0);}}")
-        sc.js.append(f'tl.fromTo("#{el}",{{clipPath:"inset(0 100% 0 0)"}},{{clipPath:"inset(0 0% 0 0)",duration:1.0,ease:"power3.inOut"}},{at(sid, "commerceguard", default=at(sid, "commerce", default=0.6))});')
+        t_logo = at(sid, "commerceguard", default=at(sid, "commerce", default=0.6))
+        sc.js.append(f'tl.fromTo("#{el}",{{clipPath:"inset(0 100% 0 0)"}},{{clipPath:"inset(0 0% 0 0)",duration:1.0,ease:"power3.inOut"}},{t_logo});')
+        sweep(sc, el, t_logo + 1.1)
         items = [("✕  No ready-made AI", "no", 0, RED), ("✕  No large language models", "language", 0, RED),
                  ("✓  Real data", "real", 0, GRN), ("✓  Honest testing", "honest", 0, GRN), ("✓  Models that explain themselves", "explain", 0, GRN)]
         y = H * (0.55 if not P else 0.46)
@@ -335,14 +381,41 @@ def S(sid, W, H):
             label(sc, f"r{i}", txt, W / 2 if not P else L, y, size=40, color=col, t=at(sid, tok, n_), anchor="center" if not P else "left")
             y += 62 * u
     elif sid == "S05":
+        import math
+        aura(sc)
+        cx, cy = (W * 0.30, H * 0.50) if not P else (W * 0.5, H * 0.36)
+        R = (300 if not P else 330) * u
+        core, ring = sc.id("core"), sc.id("ring")
+        sc.add(f'<div id="{sc.id("orb")}"></div>', f"#{sc.id('orb')}{{position:absolute;left:{cx - R}px;top:{cy - R}px;width:{2 * R}px;height:{2 * R}px;border-radius:50%;"
+               f"border:{2 * u}px dashed rgba(243,240,232,.22);}}")
+        sc.add(f'<div id="{core}"><b>Commerce<span style="color:{AMB}">Guard</span></b></div>',
+               f"#{core}{{position:absolute;left:{cx - 150 * u}px;top:{cy - 150 * u}px;width:{300 * u}px;height:{300 * u}px;{glass(sc)}border-radius:50%;"
+               f"display:flex;align-items:center;justify-content:center;font-size:{40 * u}px;letter-spacing:-0.02em;}}")
+        sc.js.append(f'tl.fromTo("#{core}",{{opacity:0,scale:.7}},{{opacity:1,scale:1,duration:.6,ease:"power3.out"}},0.2);')
+        sc.add(f'<div id="{ring}"></div>', f"#{ring}{{position:absolute;left:{cx}px;top:{cy}px;width:0;height:0;}}")
         mods = [("Delivery failure", "delivery"), ("Suspicious orders", "suspicious"), ("Refund abuse", "refund"), ("Customer behavior", "behavior")]
-        y = H * (0.22 if not P else 0.2)
+        d = dur(sid)
+        chips = []
         for i, (m, tok) in enumerate(mods):
-            label(sc, f"m{i}", m, L, y, size=46, color="#8B8A86", t=at(sid, tok), weight=700)
-            y += 76 * u
+            a = -math.pi / 2 + i * math.pi / 2
+            el = sc.id(f"m{i}")
+            chips.append(el)
+            chip_html = f'<div id="{el}" class="chipw"><div id="{el}i" class="chip">{m}</div></div>'
+            sc.html[-1] = sc.html[-1].replace("></div>", f'>{chip_html}</div>', 1) if i == 0 else sc.html[-1][:-len("</div>")] + chip_html + "</div>"
+            sc.css.append(f"#{el}{{left:{R * math.cos(a)}px;top:{R * math.sin(a)}px;}}")
+            sc.js.append(f'tl.fromTo("#{el}i",{{opacity:0,scale:.6}},{{opacity:1,scale:1,duration:.4,ease:"power3.out"}},{at(sid, tok):.2f});')
+        sc.css.append(f"#root .chipw{{position:absolute;width:0;height:0;}}#root .chip{{position:absolute;left:0;top:0;transform:translate(-50%,-50%);white-space:nowrap;padding:{14 * u}px {26 * u}px;font-weight:800;font-size:{32 * u}px;{glass(sc)}}}")
+        sc.js.append(f'tl.fromTo("#{ring}",{{rotation:0}},{{rotation:70,duration:{d:.2f},ease:"none"}},0);')
+        for el in chips:
+            sc.js.append(f'tl.fromTo("#{el}",{{rotation:0}},{{rotation:-70,duration:{d:.2f},ease:"none"}},0);')
+        t_one = at(sid, "starting", default=at(sid, "one"))
+        for el in chips[1:]:
+            sc.js.append(f'tl.to("#{el}i",{{opacity:.28,duration:.4}},{t_one:.2f});')
+        sc.js.append(f'tl.to("#{chips[0]}i",{{color:"#141517",backgroundColor:"{AMB}",duration:.4}},{t_one:.2f});')
         q = sc.id("q")
-        sc.add(f'<div id="{q}">When a customer clicks <span style="color:{AMB}">Buy</span>,<br>will the delivery promise be broken?</div>',
-               f"#{q}{{position:absolute;left:{L}px;width:{W - 2 * L}px;top:{y + 60 * u}px;font-weight:800;font-size:{(70 if not P else 64) * u}px;line-height:1.1;letter-spacing:-0.02em;}}")
+        qx, qy, qw = (W * 0.56, H * 0.34, W * 0.38) if not P else (L, H * 0.62, W - 2 * L)
+        sc.add(f'<div id="{q}">When a customer clicks <span style="color:{AMB}">Buy</span>, will the delivery promise be broken?</div>',
+               f"#{q}{{position:absolute;left:{qx}px;width:{qw}px;top:{qy}px;font-weight:800;font-size:{(66 if not P else 60) * u}px;line-height:1.1;letter-spacing:-0.02em;}}")
         sc.appear(q, at(sid, "clicks"))
     elif sid == "S06":
         chapter(sc, "THE DATA · OLIST")
@@ -377,13 +450,51 @@ def S(sid, W, H):
         sc.css.append(f"#{lk}{{z-index:10;}}")
     elif sid == "S10":
         chapter(sc, "PHASE 3 · THE TARGET")
-        y = bars(sc, [("Promised (median)", 24, "#8B8A86", at(sid, "promise", 1)), ("Actual (median)", 11, GRN, at(sid, "actual", 1))],
-                 top=H * (0.30 if not P else 0.3), unit=" days", fmt="{:.0f}", vmax=28)
-        label(sc, "early", "13 days early…", L, y + 10 * u, size=56, color=GRN, t=at(sid, "13"), weight=800)
-        label(sc, "late", "…and still 6.8% late", L, y + 90 * u, size=56, color=RED, t=at(sid, "still"), weight=800)
+        hst = DATA["hist"]
+        x0, x1 = L, W - L
+        y0, y1 = (H * 0.24, H * 0.60) if not P else (H * 0.24, H * 0.50)
+        nb = len(hst["promised"]); bw = (x1 - x0) / nb
+        vmax = max(hst["promised"] + hst["actual"]) * 1.1
+        svg = [f'<svg width="{W}" height="{H}" style="position:absolute;left:0;top:0">',
+               f'<line x1="{x0}" y1="{y1}" x2="{x1}" y2="{y1}" stroke="rgba(243,240,232,.35)" stroke-width="{2 * u}"/>']
+        ta, tp = at(sid, "promise", 1), at(sid, "actual")
+        for k, (name, col, t) in enumerate([("promised", "#8B8A86", tp - 0.3 if tp > 1 else 0.6), ("actual", GRN, ta)]):
+            pass
+        for k, (name, col, t) in enumerate([("promised", "#8B8A86", at(sid, "promise", 1) - 0.2), ("actual", GRN, at(sid, "actual", 0))]):
+            for i, v in enumerate(hst[name]):
+                h = (y1 - y0) * v / vmax
+                bid = sc.id(f"h{k}_{i}")
+                svg.append(f'<rect id="{bid}" x="{x0 + i * bw + 2 * u}" y="{y1 - h}" width="{bw - 4 * u}" height="{h}" fill="{col}" opacity="{.75 if k == 0 else .85}"/>')
+                sc.js.append(f'tl.fromTo("#{bid}",{{scaleY:0,transformOrigin:"50% 100%"}},{{scaleY:1,duration:.5,ease:"power3.out"}},{t + i * 0.025:.2f});')
+        X = lambda dd: x0 + (x1 - x0) * dd / hst["bins"][-1]
+        for k, (med, col, nm, t) in enumerate([(hst["p_med"], INK, "promised: 24 days", at(sid, "promise", 1)), (hst["a_med"], GRN, "actual: 11 days", at(sid, "actual", 0))]):
+            mid = sc.id(f"med{k}")
+            svg.append(f'<line id="{mid}" x1="{X(med)}" y1="{y0 - 10 * u}" x2="{X(med)}" y2="{y1}" stroke="{col}" stroke-width="{3 * u}" stroke-dasharray="{8 * u} {6 * u}"/>')
+            sc.js.append(f'tl.fromTo("#{mid}",{{opacity:0}},{{opacity:1,duration:.3}},{t + 0.5:.2f});')
+            label(sc, f"ml{k}", nm, X(med), y0 - 56 * u - k * (0 if not P else 44) * u, size=30, color=col, t=t + 0.5, anchor="center", mono=True)
+        for k, dd in enumerate([0, 10, 20, 30, 40, 50]):
+            label(sc, f"ax{k}", f"{dd}d", X(dd), y1 + 12 * u, size=28, color="#8B8A86", t=0.4, anchor="center", mono=True)
+        sc.add("".join(svg) + "</svg>")
+        ty = y1 + 70 * u
+        label(sc, "early", "Most parcels arrive 13 days early…", L, ty, size=50, color=GRN, t=at(sid, "13"), weight=800, w=W - 2 * L)
+        label(sc, "late", "…and still 6.8% are late", L, ty + (75 if not P else 120) * u, size=50, color=RED, t=at(sid, "still"), weight=800, w=W - 2 * L)
     elif sid == "S11":
-        kinetic(sc, [("The problem isn't speed.", at(sid, "problem"), INK), ("It's knowing which orders", at(sid, "knowing"), INK),
-                     ("will go wrong.", at(sid, "wrong"), AMB)], size=96)
+        import random
+        kinetic(sc, [("The problem isn't speed.", at(sid, "problem"), INK)], top=H * (0.16 if not P else 0.16), size=84)
+        gx, gy, cell = (W * 0.08, H * 0.34, 46 * u) if not P else (W * 0.07, H * 0.28, 74 * u)
+        cols = 20 if not P else 10
+        rnd = random.Random(11); late = set(rnd.sample(range(100), 7))
+        for i in range(100):
+            el = sc.id(f"g{i}")
+            r_, c_ = divmod(i, cols)
+            sc.add(f'<div id="{el}" class="pc"></div>', f"#{el}{{left:{gx + c_ * cell * 1.0}px;top:{gy + r_ * cell * 1.0}px;}}")
+            sc.js.append(f'tl.fromTo("#{el}",{{opacity:0,scale:.4}},{{opacity:1,scale:1,duration:.25}},{at(sid, "knowing") - 0.6 + (i % cols) * 0.02 + r_ * 0.03:.2f});')
+            if i in late:
+                sc.js.append(f'tl.to("#{el}",{{backgroundColor:"{RED}",scale:1.15,duration:.3}},{at(sid, "wrong"):.2f});')
+        sc.css.append(f"#root .pc{{position:absolute;width:{cell * 0.78}px;height:{cell * 0.70}px;border-radius:{5 * u}px;background:#C49A6C;"
+                      f"box-shadow:0 {4 * u}px {10 * u}px rgba(0,0,0,.35);}}")
+        q = label(sc, "q", "100 orders. 7 will be late. Which ones?", L if not P else L, (gy + 5 * cell + 40 * u) if not P else (gy + 10 * cell + 30 * u),
+                  size=54, color=AMB, t=at(sid, "knowing") + 0.9, weight=800, w=W - 2 * L)
     elif sid == "S12":
         chapter(sc, "PHASE 4 · EXPLORE")
         capture(sc, [{"cell": 15, "h": 1558, "start": 0.2, "end": dur(sid), "hl": [("0.180", at(sid, "18")), ("0.144", at(sid, "14"))], "zoom": 2.4}])
@@ -401,9 +512,7 @@ def S(sid, W, H):
         y = H * (0.20 if not P else 0.66)
         for i, (f_, tok) in enumerate(feats):
             if P:
-                el = label(sc, f"f{i}", "+ " + f_, L, y, size=40, color=AMB if i == 5 else INK, t=at(sid, tok), mono=True, w=W - 2 * L)
-                if i + 1 < len(feats):
-                    sc.js.append(f'tl.to("#{el}",{{opacity:0,duration:.15}},{at(sid, feats[i + 1][1]) - 0.05:.2f});')
+                label(sc, f"f{i}", "+ " + f_, L + (i % 2) * W * 0.46, H * 0.62 + (i // 2) * 90 * u, size=30, color=AMB if i == 5 else INK, t=at(sid, tok), mono=True, w=W * 0.43)
                 continue
             label(sc, f"f{i}", "+ " + f_, (L + vw + 50 * u) if not P else L, y + i * (92 if not P else 58) * u, size=36, w=(W - vw - 2 * L - 50 * u) if not P else None,
                   color=AMB if i == 5 else INK, t=at(sid, tok), mono=True)
@@ -458,13 +567,33 @@ def S(sid, W, H):
                       ("LightGBM", 0.299, AMB, at(sid, "gbm"))], top=H * (0.3 if not P else 0.3), vmax=0.34, title="PR-AUC (higher is better)", title_t=at(sid, "precision"))
         label(sc, "top", "Top 10% riskiest orders → 35% of all late ones", L, y + 20 * u, size=40, color=AMB, t=at(sid, "35"), weight=800, w=W - 2 * L)
     elif sid == "S18":
-        el = sc.id("lock")
-        sc.add(f'<div id="{el}">🔒</div>', f"#{el}{{position:absolute;left:0;right:0;top:{H * 0.28}px;text-align:center;font-size:{180 * u}px;}}")
-        sc.appear(el, 0.3)
-        sc.js.append(f'tl.to("#{el}",{{rotate:-12,scale:1.1,duration:.3,ease:"power2.out"}},{at(sid, "opened")});')
-        sc.js.append(f'tl.call(()=>{{}},[],{at(sid, "opened")});')
-        label(sc, "cal", "Scores calibrated on validation", W / 2, H * (0.58 if not P else 0.52), size=44, t=at(sid, "calibrated"), anchor="center")
-        label(sc, "once", "TEST SET · OPENED ONCE", W / 2, H * (0.68 if not P else 0.6), size=70, color=AMB, t=at(sid, "once"), anchor="center", weight=800)
+        aura(sc, (AMB, "#6C8CFF"))
+        chapter(sc, "HOW ONE PREDICTION IS MADE")
+        steps = [("Order at checkout", "price · items · seller · state"), ("22 features", "only known at checkout"), ("LightGBM", "78 trees"),
+                 ("Calibrated risk", "30% means ~30%"), ("Review band", "low · moderate · high")]
+        n_ = len(steps)
+        if not P:
+            cw, ch_ = (W - 2 * L - (n_ - 1) * 40 * u) / n_, 200 * u
+            pos = [(L + i * (cw + 40 * u), H * 0.28) for i in range(n_)]
+        else:
+            cw, ch_ = W - 2 * L, 120 * u
+            pos = [(L, H * 0.16 + i * (ch_ + 34 * u)) for i in range(n_)]
+        for i, ((t1, t2), (x, y)) in enumerate(zip(steps, pos)):
+            el = sc.id(f"st{i}")
+            sc.add(f'<div id="{el}" class="gs"><b>{t1}</b><span>{t2}</span></div>', f"#{el}{{left:{x}px;top:{y}px;width:{cw}px;height:{ch_}px;}}")
+            sc.js.append(f'tl.fromTo("#{el}",{{opacity:0,y:{30 * u}}},{{opacity:1,y:0,duration:.45,ease:"power3.out"}},{0.3 + i * 0.45:.2f});')
+            if i < n_ - 1:
+                ar = sc.id(f"ar{i}")
+                ax, ay = ((x + cw + 6 * u, y + ch_ / 2 - 22 * u) if not P else (x + cw / 2 - 14 * u, y + ch_ + 2 * u))
+                sc.add(f'<div id="{ar}" class="ar">{"→" if not P else "↓"}</div>', f"#{ar}{{left:{ax}px;top:{ay}px;}}")
+                sc.js.append(f'tl.fromTo("#{ar}",{{opacity:0}},{{opacity:1,duration:.3}},{0.55 + i * 0.45:.2f});')
+        sc.css.append(f"#root .gs{{position:absolute;{glass(sc)}display:flex;flex-direction:column;justify-content:center;padding:0 {22 * u}px;}}"
+                      f"#root .gs b{{font-size:{34 * u}px;font-weight:800;}}#root .gs span{{font-size:{28 * u}px;color:#B8B5AE;font-family:'JetBrains Mono',monospace;margin-top:{8 * u}px;}}"
+                      f"#root .ar{{position:absolute;font-size:{36 * u}px;color:{AMB};font-weight:800;}}")
+        sc.js.append(f'tl.to("#{sc.id("st3")}",{{borderColor:"{AMB}",duration:.3}},{at(sid, "calibrated"):.2f});')
+        oy = H * (0.62 if not P else 0.64)
+        label(sc, "once", "🔓  TEST SET · OPENED ONCE", W / 2 if not P else L, oy, size=(64 if not P else 50), color=AMB, t=at(sid, "once"),
+              anchor="center" if not P else "left", weight=800, w=None if not P else W - 2 * L)
     elif sid == "S19":
         chapter(sc, "PHASE 10 · THE TEST")
         y = bars(sc, [("LightGBM · validation", 0.299, "#8B8A86", 0.4), ("LightGBM · test", 0.102, RED, at(sid, "scored")),
@@ -488,13 +617,30 @@ def S(sid, W, H):
             sc.js.append(f'tl.fromTo("#{el}",{{opacity:0}},{{opacity:1,duration:.25}},{at(sid, tok):.2f});')
         sc.css.append(f"#root .hl2{{position:absolute;border:{4 * u}px solid {AMB};border-radius:{8 * u}px;opacity:0;}}")
     elif sid == "S22":
-        kinetic(sc, [("The #1 factor:", 0.3, INK), ("the calendar month.", at(sid, "calendar"), AMB),
-                     ("It partly memorised last year's bad months.", at(sid, "memorised", default=at(sid, "memorized", default=4)), RED)], size=90)
+        if not P:
+            kinetic(sc, [("The #1 factor:", 0.3, INK), ("the calendar month.", at(sid, "calendar"), AMB)], top=H * 0.24, size=76)
+            label(sc, "mem", "It partly memorised last year's bad months.", L, H * 0.56, size=44, color=RED, t=at(sid, "memorised", default=at(sid, "memorized", default=4)), weight=800, w=W * 0.40)
+            iw = W * 0.44; ix, iy = W - L - iw, H * 0.12
+        else:
+            kinetic(sc, [("The #1 factor:", 0.3, INK), ("the calendar month.", at(sid, "calendar"), AMB)], top=H * 0.16, size=72)
+            label(sc, "mem", "It partly memorised last year's bad months.", L, H * 0.30, size=42, color=RED, t=at(sid, "memorised", default=at(sid, "memorized", default=4)), weight=800, w=W - 2 * L)
+            iw = W - 2 * L; ix, iy = L, H * 0.38
+        fr = sc.id("wfg")
+        sc.add(f'<div id="{fr}"><div class="cap2">One real prediction, explained (riskiest test order)</div><img src="assets/shap_riskiest_order.png"/></div>',
+               f"#{fr}{{position:absolute;left:{ix}px;top:{iy}px;width:{iw}px;padding:{16 * u}px;{glass(sc)}}}"
+               f"#{fr} img{{width:100%;border-radius:{10 * u}px;display:block;background:#fff;}}#{fr} .cap2{{font-size:{28 * u}px;font-weight:700;color:{AMB};margin-bottom:{10 * u}px;}}")
+        sc.appear(fr, 0.6)
     elif sid == "S23":
         chapter(sc, "PHASE 13 · A BETTER PROMISE?")
-        kinetic(sc, [("Don't just flag risk.", at(sid, "flagging"), INK), ("Promise a better date.", at(sid, "promise"), AMB)], top=H * 0.25, size=88)
-        label(sc, "how", "quantile regression on delivery days · level chosen on validation", L, H * (0.62 if not P else 0.58), size=34,
-              color="#B8B5AE", t=at(sid, "trained"), mono=True, w=W - 2 * L)
+        aura(sc, (GRN, AMB))
+        kinetic(sc, [("Don't just flag risk.", at(sid, "flagging"), INK), ("Promise a better date.", at(sid, "promise"), AMB)], top=H * (0.16 if not P else 0.16), size=76)
+        iw = W * (0.46 if not P else 1) - (0 if not P else 2 * L)
+        fr = sc.id("slk")
+        sc.add(f'<div id="{fr}"><img src="assets/promise_slack.png"/></div>',
+               f"#{fr}{{position:absolute;left:{L}px;top:{H * (0.38 if not P else 0.36)}px;width:{iw}px;padding:{14 * u}px;{glass(sc)}}}#{fr} img{{width:100%;border-radius:{10 * u}px;display:block;background:#fff;}}")
+        sc.appear(fr, at(sid, "instead", default=2.0))
+        label(sc, "how", "quantile regression on delivery days · level chosen on validation", (L + iw + 40 * u) if not P else L,
+              H * (0.42 if not P else 0.64), size=32, color="#B8B5AE", t=at(sid, "trained"), mono=True, w=(W - iw - 2 * L - 40 * u) if not P else W - 2 * L)
     elif sid == "S24":
         chapter(sc, "EXPERIMENT 1 · TEST MONTHS")
         y = bars(sc, [("Olist promise", 25.9, "#8B8A86", 0.4), ("My promise", 16.6, GRN, at(sid, "9.3"))], top=H * (0.28 if not P else 0.26),
@@ -570,9 +716,10 @@ def S(sid, W, H):
         sc.add(f'<div id="{el}"><span>Commerce</span><span style="color:{AMB}">Guard</span></div>',
                f"#{el}{{position:absolute;left:0;right:0;top:{H * (0.30 if not P else 0.30)}px;text-align:center;font-weight:800;font-size:{(140 if not P else 112) * u}px;letter-spacing:-0.04em;}}")
         sc.appear(el, at(sid, "commerce"))
+        sweep(sc, el, at(sid, "commerce") + 0.6)
         label(sc, "tg", "Predict risk. Understand behavior. Reduce preventable losses.", W / 2, H * (0.30 if not P else 0.30) + 190 * u, size=36,
               t=at(sid, "predict"), anchor="center" if not P else "center", w=None if not P else None)
-        label(sc, "gh", "Notebook: link in the description", W / 2, H * (0.62 if not P else 0.56), size=40, color="#B8B5AE", t=at(sid, "notebook"), anchor="center", mono=True)
+        label(sc, "gh", "Full notebook: with Episode 2", W / 2, H * (0.62 if not P else 0.56), size=40, color="#B8B5AE", t=at(sid, "notebook"), anchor="center", mono=True)
         label(sc, "st", "One step at a time. One model at a time.", W / 2, H * (0.70 if not P else 0.62), size=44, color=AMB, t=at(sid, "step"), anchor="center", weight=800)
     return sc
 
@@ -671,7 +818,7 @@ def project(out, W, H, ids, reel=None):
     if out != HERE:
         if (out / "assets").exists():
             shutil.rmtree(out / "assets")
-        shutil.copytree(HERE / "assets", out / "assets")
+        shutil.copytree(HERE / "assets", out / "assets", ignore=shutil.ignore_patterns("long_bed.wav", "bed.wav", "science_ambient_technology.mp3"))
     t, hosts, audio, timeline = 0.0, [], [], []
     if reel:
         ids = list(ids)
@@ -699,6 +846,11 @@ def project(out, W, H, ids, reel=None):
             timeline.append((sid, t))
         t += d
     total = round(t, 2)
+    off = {None: 0, 1: 0, 2: 48, 3: 96}[reel]  # each reel starts at a different point in the track
+    bed = out / "assets/music/bed.wav"
+    subprocess.run(["ffmpeg", "-v", "error", "-y", "-ss", str(off), "-t", f"{total:.2f}", "-i", str(HERE / "assets/music/long_bed.wav"),
+                    "-af", f"afade=t=in:d=1.5,afade=t=out:st={max(0, total - 3):.2f}:d=3", str(bed)], check=True)
+    audio.append(f'<audio id="bgm" class="clip" src="assets/music/bed.wav" data-start="0" data-duration="{total}" data-track-index="20" data-volume="0.18"></audio>')
     (out / "compositions/captions.html").write_text(captions(W, H, timeline))
     hosts.append(f'<div id="captions" data-composition-id="captions" data-composition-src="compositions/captions.html" data-start="0" data-duration="{total}" '
                  f'data-track-index="5" data-track-kind="captions" data-width="{W}" data-height="{H}" style="z-index:5"></div>')

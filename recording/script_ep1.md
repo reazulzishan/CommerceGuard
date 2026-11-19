@@ -94,7 +94,7 @@ So, not a magic win. A real trade off. Promise faster, and accept a few more lat
 This is episode one. The data is from Brazil, and late is not the same as a failed delivery. Next, I want to work on cash on delivery failures, with real data from Bangladeshi sellers.
 
 [S31] REEL 7
-The full notebook is on my GitHub, link in the description. One step at a time. One model at a time. CommerceGuard. Predict risk. Understand behavior. Reduce preventable losses.
+I will share the full notebook in the next episode, once CommerceGuard becomes a multi-model system. One step at a time. One model at a time. CommerceGuard. Predict risk. Understand behavior. Reduce preventable losses.
 
 # Reel outro hooks (FB/Insta only, 3 parts)
 [R1] Next part: the real problem, and how I stopped my own model from cheating.
