@@ -1,0 +1,16 @@
+<template>
+<style>
+#root{position:absolute;inset:0;overflow:hidden;background:#141517;background-image:linear-gradient(rgba(255,255,255,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.035) 1px,transparent 1px);background-size:120px 120px;
+ font-family:Inter,sans-serif;color:#F3F0E8;}
+#root .mono{font-family:'JetBrains Mono',monospace;}
+#e22-chap{position:absolute;left:153.6px;top:86.4px;font-size:32.0px;font-weight:800;color:#FFB224;white-space:nowrap;line-height:1.15;}#e22-chap{z-index:10;}#e22-chap>div{background:rgba(20,21,23,.85);padding:6.0px 14.0px;border-radius:8.0px;margin-left:-14.0px;}#e22-btitle{position:absolute;left:153.6px;top:245.60000000000002px;font-size:52.0px;font-weight:800;color:#F3F0E8;white-space:nowrap;line-height:1.15;}#e22-bl0{position:absolute;left:153.6px;top:345.6px;width:576.0px;font-size:44.0px;font-weight:700;line-height:96.0px;}#e22-b0{position:absolute;left:753.6px;top:345.6px;height:96.0px;width:640.5824px;background:#FF5C4D;border-radius:6.0px;transform-origin:left center;}#e22-bv0{position:absolute;left:1414.1824000000001px;top:345.6px;font-size:56.0px;font-weight:700;line-height:96.0px;color:#FF5C4D;}#e22-bl1{position:absolute;left:153.6px;top:481.6px;width:576.0px;font-size:44.0px;font-weight:700;line-height:96.0px;}#e22-b1{position:absolute;left:753.6px;top:481.6px;height:96.0px;width:133.1904px;background:#3CC6A4;border-radius:6.0px;transform-origin:left center;}#e22-bv1{position:absolute;left:906.7904000000001px;top:481.6px;font-size:56.0px;font-weight:700;line-height:96.0px;color:#3CC6A4;}#e22-x5{position:absolute;left:115.19999999999999px;top:647.6px;border:6.0px solid #FF5C4D;color:#FF5C4D;font-weight:800;font-size:56.0px;padding:10.0px 26.0px;border-radius:10.0px;}
+</style>
+<div id="root" data-composition-id="e22" data-width="1920" data-height="1080">
+<div id="e22-chap"><div style="transform:translateX(0)">BUT…</div></div><div id="e22-btitle"><div style="transform:translateX(0)">Order items refunded</div></div><div id="e22-bl0">Cash on delivery</div><div id="e22-b0"></div><div id="e22-bv0" class="mono">20.2%</div><div id="e22-bl1">Paid online</div><div id="e22-b1"></div><div id="e22-bv1" class="mono">4.2%</div><div id="e22-x5">≈ 5× MORE REFUNDS · RAFI'S PROBLEM</div>
+</div>
+<script>
+const tl = gsap.timeline({paused:true});
+tl.fromTo("#e22-btitle",{opacity:0,y:20},{opacity:1,y:0,duration:0.5,ease:"power3.out"},2.11);tl.fromTo("#e22-bl0",{opacity:0,y:10},{opacity:1,y:0,duration:0.5,ease:"power3.out"},5.22);tl.fromTo("#e22-b0",{scaleX:0},{scaleX:1,duration:.7,ease:"power3.out"},5.22);tl.fromTo("#e22-bv0",{opacity:0,y:10},{opacity:1,y:0,duration:0.3,ease:"power3.out"},5.67);tl.fromTo("#e22-bl1",{opacity:0,y:10},{opacity:1,y:0,duration:0.5,ease:"power3.out"},6.74);tl.fromTo("#e22-b1",{scaleX:0},{scaleX:1,duration:.7,ease:"power3.out"},6.74);tl.fromTo("#e22-bv1",{opacity:0,y:10},{opacity:1,y:0,duration:0.3,ease:"power3.out"},7.19);tl.fromTo("#e22-x5",{opacity:0,scale:1.4},{opacity:1,scale:1,duration:.25,ease:"power4.in"},7.61);
+window.__timelines["e22"] = tl;
+</script>
+</template>

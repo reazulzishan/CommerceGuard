@@ -1,0 +1,16 @@
+<template>
+<style>
+#root{position:absolute;inset:0;overflow:hidden;background:#141517;background-image:linear-gradient(rgba(255,255,255,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.035) 1px,transparent 1px);background-size:120px 120px;
+ font-family:Inter,sans-serif;color:#F3F0E8;}
+#root .mono{font-family:'JetBrains Mono',monospace;}
+#e16-chap{position:absolute;left:153.6px;top:86.4px;font-size:32.0px;font-weight:800;color:#FFB224;white-space:nowrap;line-height:1.15;}#e16-chap{z-index:10;}#e16-chap>div{background:rgba(20,21,23,.85);padding:6.0px 14.0px;border-radius:8.0px;margin-left:-14.0px;}#e16-tp{position:absolute;left:115.19999999999999px;top:162.0px;width:1075.2px;padding:14.0px;background:rgba(255,255,255,.07);border:2px solid rgba(255,255,255,.18);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);box-shadow:inset 0 1px 0 rgba(255,255,255,.22),0 24px 60px rgba(0,0,0,.45);border-radius:20px;}#e16-tp img{width:100%;display:block;border-radius:10.0px;background:#fff;}#e16-x15{position:absolute;left:1240.4px;top:259.2px;font-size:120.0px;font-weight:800;color:#FF5C4D;white-space:nowrap;line-height:1.15;}#e16-x15b{position:absolute;left:1240.4px;top:399.2px;font-size:36.0px;font-weight:800;color:#F3F0E8;width:576.0px;line-height:1.15;}#e16-x12{position:absolute;left:1240.4px;top:519.2px;font-size:120.0px;font-weight:800;color:#FF5C4D;white-space:nowrap;line-height:1.15;}#e16-x12b{position:absolute;left:1240.4px;top:659.2px;font-size:36.0px;font-weight:800;color:#F3F0E8;width:576.0px;line-height:1.15;}
+</style>
+<div id="root" data-composition-id="e16" data-width="1920" data-height="1080">
+<div id="e16-chap"><div style="transform:translateX(0)">WHAT UNHAPPY CUSTOMERS TALK ABOUT</div></div><div id="e16-tp"><img src="assets/figs/ep2_topics.png"/></div><div id="e16-x15"><div style="transform:translateX(0)">15×</div></div><div id="e16-x15b"><div style="transform:translateX(0)">more talk of returns & refunds</div></div><div id="e16-x12"><div style="transform:translateX(0)">12×</div></div><div id="e16-x12b"><div style="transform:translateX(0)">more talk of damaged products</div></div>
+</div>
+<script>
+const tl = gsap.timeline({paused:true});
+tl.fromTo("#e16-tp",{opacity:0,y:30},{opacity:1,y:0,duration:0.5,ease:"power3.out"},0.3);tl.fromTo("#e16-x15",{opacity:0,y:20},{opacity:1,y:0,duration:0.5,ease:"power3.out"},4.73);tl.fromTo("#e16-x15b",{opacity:0,y:20},{opacity:1,y:0,duration:0.5,ease:"power3.out"},4.930000000000001);tl.fromTo("#e16-x12",{opacity:0,y:20},{opacity:1,y:0,duration:0.5,ease:"power3.out"},7.95);tl.fromTo("#e16-x12b",{opacity:0,y:20},{opacity:1,y:0,duration:0.5,ease:"power3.out"},8.15);
+window.__timelines["e16"] = tl;
+</script>
+</template>

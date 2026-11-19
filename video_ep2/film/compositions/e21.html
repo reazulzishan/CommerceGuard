@@ -1,0 +1,16 @@
+<template>
+<style>
+#root{position:absolute;inset:0;overflow:hidden;background:#141517;background-image:linear-gradient(rgba(255,255,255,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.035) 1px,transparent 1px);background-size:120px 120px;
+ font-family:Inter,sans-serif;color:#F3F0E8;}
+#root .mono{font-family:'JetBrains Mono',monospace;}
+#e21-chap{position:absolute;left:153.6px;top:86.4px;font-size:32.0px;font-weight:800;color:#FFB224;white-space:nowrap;line-height:1.15;}#e21-chap{z-index:10;}#e21-chap>div{background:rgba(20,21,23,.85);padding:6.0px 14.0px;border-radius:8.0px;margin-left:-14.0px;}#e21-btitle{position:absolute;left:153.6px;top:245.60000000000002px;font-size:52.0px;font-weight:800;color:#F3F0E8;white-space:nowrap;line-height:1.15;}#e21-bl0{position:absolute;left:153.6px;top:345.6px;width:576.0px;font-size:44.0px;font-weight:700;line-height:96.0px;}#e21-b0{position:absolute;left:753.6px;top:345.6px;height:96.0px;width:98.79507692307693px;background:#3CC6A4;border-radius:6.0px;transform-origin:left center;}#e21-bv0{position:absolute;left:872.395076923077px;top:345.6px;font-size:56.0px;font-weight:700;line-height:96.0px;color:#3CC6A4;}#e21-bl1{position:absolute;left:153.6px;top:481.6px;width:576.0px;font-size:44.0px;font-weight:700;line-height:96.0px;}#e21-b1{position:absolute;left:753.6px;top:481.6px;height:96.0px;width:704.9821538461539px;background:#FF5C4D;border-radius:6.0px;transform-origin:left center;}#e21-bv1{position:absolute;left:1478.582153846154px;top:481.6px;font-size:56.0px;font-weight:700;line-height:96.0px;color:#FF5C4D;}#e21-n{position:absolute;left:115.19999999999999px;top:637.6px;font-size:34.0px;font-weight:700;color:#B8B5AE;width:1689.6px;line-height:1.15;}
+</style>
+<div id="root" data-composition-id="e21" data-width="1920" data-height="1080">
+<div id="e21-chap"><div style="transform:translateX(0)">THE SURPRISE</div></div><div id="e21-btitle"><div style="transform:translateX(0)">Order items cancelled</div></div><div id="e21-bl0">Cash on delivery</div><div id="e21-b0"></div><div id="e21-bv0" class="mono">8.1%</div><div id="e21-bl1">Paid online</div><div id="e21-b1"></div><div id="e21-bv1" class="mono">57.8%</div><div id="e21-n"><div style="transform:translateX(0)">many online cancellations are simply abandoned payments</div></div>
+</div>
+<script>
+const tl = gsap.timeline({paused:true});
+tl.fromTo("#e21-btitle",{opacity:0,y:20},{opacity:1,y:0,duration:0.5,ease:"power3.out"},3.82);tl.fromTo("#e21-bl0",{opacity:0,y:10},{opacity:1,y:0,duration:0.5,ease:"power3.out"},5.24);tl.fromTo("#e21-b0",{scaleX:0},{scaleX:1,duration:.7,ease:"power3.out"},5.24);tl.fromTo("#e21-bv0",{opacity:0,y:10},{opacity:1,y:0,duration:0.3,ease:"power3.out"},5.69);tl.fromTo("#e21-bl1",{opacity:0,y:10},{opacity:1,y:0,duration:0.5,ease:"power3.out"},6.18);tl.fromTo("#e21-b1",{scaleX:0},{scaleX:1,duration:.7,ease:"power3.out"},6.18);tl.fromTo("#e21-bv1",{opacity:0,y:10},{opacity:1,y:0,duration:0.3,ease:"power3.out"},6.63);tl.fromTo("#e21-n",{opacity:0,y:20},{opacity:1,y:0,duration:0.5,ease:"power3.out"},9.65);
+window.__timelines["e21"] = tl;
+</script>
+</template>

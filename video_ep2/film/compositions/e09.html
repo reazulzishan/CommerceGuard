@@ -1,0 +1,16 @@
+<template>
+<style>
+#root{position:absolute;inset:0;overflow:hidden;background:#141517;background-image:linear-gradient(rgba(255,255,255,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.035) 1px,transparent 1px);background-size:120px 120px;
+ font-family:Inter,sans-serif;color:#F3F0E8;}
+#root .mono{font-family:'JetBrains Mono',monospace;}
+#e09-aura0{position:absolute;left:162.39999999999998px;top:64.0px;width:520.0px;height:520.0px;border-radius:50%;background:#FF5C4D;opacity:.16;filter:blur(110.0px);}#e09-aura1{position:absolute;left:1237.6000000000001px;top:496.0px;width:520.0px;height:520.0px;border-radius:50%;background:#FFB224;opacity:.16;filter:blur(110.0px);}#e09-chap{position:absolute;left:153.6px;top:86.4px;font-size:32.0px;font-weight:800;color:#FFB224;white-space:nowrap;line-height:1.15;}#e09-chap{z-index:10;}#e09-chap>div{background:rgba(20,21,23,.85);padding:6.0px 14.0px;border-radius:8.0px;margin-left:-14.0px;}#e09-pl0{left:115.19999999999999px;top:280.8px;}#e09-pl1{left:691.2px;top:280.8px;}#root .plat{position:absolute;padding:24.0px 40.0px;font-size:60.0px;font-weight:800;background:rgba(255,255,255,.07);border:2px solid rgba(255,255,255,.18);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);box-shadow:inset 0 1px 0 rgba(255,255,255,.22),0 24px 60px rgba(0,0,0,.45);border-radius:20px;}#e09-a{position:absolute;left:115.19999999999999px;top:518.4px;font-size:60.0px;font-weight:800;color:#F3F0E8;width:1689.6px;line-height:1.15;}#e09-b2{position:absolute;left:115.19999999999999px;top:648.0px;font-size:60.0px;font-weight:800;color:#FF5C4D;width:1689.6px;line-height:1.15;}
+</style>
+<div id="root" data-composition-id="e09" data-width="1920" data-height="1080">
+<div id="e09-aura0"></div><div id="e09-aura1"></div><div id="e09-chap"><div style="transform:translateX(0)">2021 · THE COLLAPSE</div></div><div id="e09-pl0" class="plat">Evaly</div><div id="e09-pl1" class="plat">e-Orange</div><div id="e09-a"><div style="transform:translateX(0)">Pay first. Huge discounts.</div></div><div id="e09-b2"><div style="transform:translateX(0)">Then the deliveries stopped.</div></div>
+</div>
+<script>
+const tl = gsap.timeline({paused:true});
+tl.fromTo("#e09-aura0",{x:0,y:0},{x:90.0,y:-50.0,duration:8.27,ease:"sine.inOut"},0);tl.fromTo("#e09-aura1",{x:0,y:0},{x:-80.0,y:60.0,duration:8.27,ease:"sine.inOut"},0);tl.fromTo("#e09-pl0",{opacity:0,y:30.0},{opacity:1,y:0,duration:.5,ease:"expo.out"},0.40);tl.fromTo("#e09-pl1",{opacity:0,y:30.0},{opacity:1,y:0,duration:.5,ease:"expo.out"},0.90);tl.fromTo("#e09-a",{opacity:0,y:20},{opacity:1,y:0,duration:0.5,ease:"power3.out"},3.15);tl.fromTo("#e09-b2",{opacity:0,y:20},{opacity:1,y:0,duration:0.5,ease:"power3.out"},6.37);
+window.__timelines["e09"] = tl;
+</script>
+</template>

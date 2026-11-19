@@ -1,0 +1,16 @@
+<template>
+<style>
+#root{position:absolute;inset:0;overflow:hidden;background:#141517;background-image:linear-gradient(rgba(255,255,255,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.035) 1px,transparent 1px);background-size:120px 120px;
+ font-family:Inter,sans-serif;color:#F3F0E8;}
+#root .mono{font-family:'JetBrains Mono',monospace;}
+#e10-chap{position:absolute;left:153.6px;top:86.4px;font-size:32.0px;font-weight:800;color:#FFB224;white-space:nowrap;line-height:1.15;}#e10-chap{z-index:10;}#e10-chap>div{background:rgba(20,21,23,.85);padding:6.0px 14.0px;border-radius:8.0px;margin-left:-14.0px;}#e10-a{position:absolute;left:115.19999999999999px;top:237.6px;font-size:120.0px;font-weight:800;color:#FF5C4D;white-space:nowrap;line-height:1.15;}#e10-a2{position:absolute;left:115.19999999999999px;top:387.6px;font-size:36.0px;font-weight:700;color:#F3F0E8;width:1689.6px;line-height:1.15;}#e10-c{position:absolute;left:115.19999999999999px;top:537.6px;font-size:120.0px;font-weight:800;color:#3CC6A4;white-space:nowrap;line-height:1.15;}#e10-c2{position:absolute;left:115.19999999999999px;top:687.6px;font-size:36.0px;font-weight:700;color:#F3F0E8;width:1689.6px;line-height:1.15;}#e10-src{position:absolute;left:115.19999999999999px;top:864.0px;font-size:28.0px;font-weight:700;color:#8B8A86;width:1689.6px;line-height:1.15;}
+</style>
+<div id="root" data-composition-id="e10" data-width="1920" data-height="1080">
+<div id="e10-chap"><div style="transform:translateX(0)">THE MONEY</div></div><div id="e10-a"><div style="transform:translateX(0)">≈ Tk 3,000 crore</div></div><div id="e10-a2"><div style="transform:translateX(0)">stuck in Evaly, e-Orange and Dhamaka (official estimate)</div></div><div id="e10-c"><div style="transform:translateX(0)">Tk 252 crore</div></div><div id="e10-c2"><div style="transform:translateX(0)">returned by September 2022, to 28,867 customers</div></div><div id="e10-src"><div style="transform:translateX(0)">Source: The Daily Observer; Dhaka Tribune / Financial Express (Ministry of Commerce)</div></div>
+</div>
+<script>
+const tl = gsap.timeline({paused:true});
+tl.fromTo("#e10-a",{opacity:0,y:20},{opacity:1,y:0,duration:0.5,ease:"power3.out"},0.5);tl.fromTo("#e10-a2",{opacity:0,y:20},{opacity:1,y:0,duration:0.5,ease:"power3.out"},4.01);tl.fromTo("#e10-c",{opacity:0,y:20},{opacity:1,y:0,duration:0.5,ease:"power3.out"},6.5);tl.fromTo("#e10-c2",{opacity:0,y:20},{opacity:1,y:0,duration:0.5,ease:"power3.out"},9.66);tl.fromTo("#e10-src",{opacity:0,y:20},{opacity:1,y:0,duration:0.5,ease:"power3.out"},10.06);
+window.__timelines["e10"] = tl;
+</script>
+</template>

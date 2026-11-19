@@ -1,0 +1,16 @@
+<template>
+<style>
+#root{position:absolute;inset:0;overflow:hidden;background:#141517;background-image:linear-gradient(rgba(255,255,255,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.035) 1px,transparent 1px);background-size:120px 120px;
+ font-family:Inter,sans-serif;color:#F3F0E8;}
+#root .mono{font-family:'JetBrains Mono',monospace;}
+#e11-aura0{position:absolute;left:162.39999999999998px;top:64.0px;width:520.0px;height:520.0px;border-radius:50%;background:#FFB224;opacity:.16;filter:blur(110.0px);}#e11-aura1{position:absolute;left:1237.6000000000001px;top:496.0px;width:520.0px;height:520.0px;border-radius:50%;background:#FF5C4D;opacity:.16;filter:blur(110.0px);}#e11-buy{left:384.0px;top:475.2px;}#e11-sel{left:1305.6000000000001px;top:475.2px;}#root .who{position:absolute;width:300.0px;height:300.0px;border-radius:50%;background:rgba(255,255,255,.07);border:2px solid rgba(255,255,255,.18);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);box-shadow:inset 0 1px 0 rgba(255,255,255,.22),0 24px 60px rgba(0,0,0,.45);border-radius:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:52.0px;}#e11-shield{position:absolute;left:900.0px;top:255.2px;font-size:120.0px;}#e11-risk{position:absolute;left:644.0px;top:565.2px;font-size:56.0px;font-weight:800;color:#FF5C4D;}#e11-cap{position:absolute;left:115.19999999999999px;top:777.6px;font-size:44.0px;font-weight:800;color:#F3F0E8;width:1689.6px;line-height:1.15;}
+</style>
+<div id="root" data-composition-id="e11" data-width="1920" data-height="1080">
+<div id="e11-aura0"></div><div id="e11-aura1"></div><div id="e11-buy" class="who"><b>Buyer</b></div><div id="e11-sel" class="who"><b>Seller</b></div><div id="e11-shield">🛡</div><div id="e11-risk">RISK →</div><div id="e11-cap"><div style="transform:translateX(0)">Cash on delivery protects the buyer. The seller carries the risk.</div></div>
+</div>
+<script>
+const tl = gsap.timeline({paused:true});
+tl.fromTo("#e11-aura0",{x:0,y:0},{x:90.0,y:-50.0,duration:10.51,ease:"sine.inOut"},0);tl.fromTo("#e11-aura1",{x:0,y:0},{x:-80.0,y:60.0,duration:10.51,ease:"sine.inOut"},0);tl.fromTo("#e11-buy",{opacity:0,y:30},{opacity:1,y:0,duration:0.5,ease:"power3.out"},0.3);tl.fromTo("#e11-sel",{opacity:0,y:30},{opacity:1,y:0,duration:0.5,ease:"power3.out"},0.3);tl.fromTo("#e11-shield",{opacity:0,x:0},{opacity:1,x:-456.0,duration:.8,ease:"power2.inOut"},5.49);tl.fromTo("#e11-risk",{opacity:0,x:0},{opacity:1,x:414.7,duration:.8,ease:"power2.inOut"},8.19);tl.fromTo("#e11-cap",{opacity:0,y:20},{opacity:1,y:0,duration:0.5,ease:"power3.out"},7.27);
+window.__timelines["e11"] = tl;
+</script>
+</template>

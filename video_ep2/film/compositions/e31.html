@@ -1,0 +1,16 @@
+<template>
+<style>
+#root{position:absolute;inset:0;overflow:hidden;background:#141517;background-image:linear-gradient(rgba(255,255,255,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.035) 1px,transparent 1px);background-size:120px 120px;
+ font-family:Inter,sans-serif;color:#F3F0E8;}
+#root .mono{font-family:'JetBrains Mono',monospace;}
+#e31-logo{position:absolute;left:0;right:0;top:302.40000000000003px;text-align:center;font-weight:800;font-size:140.0px;letter-spacing:-0.04em;}#e31-logo span{background-image:linear-gradient(100deg,currentColor 0%,currentColor 42%,#FFFFFF 50%,currentColor 58%,currentColor 100%);background-size:300% 100%;background-position:100% 0;-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;}#e31-v{position:absolute;left:960.0px;top:492.40000000000003px;font-size:40.0px;font-weight:800;color:#FFB224;white-space:nowrap;line-height:1.15;}#e31-t{position:absolute;left:960.0px;top:572.4000000000001px;font-size:34.0px;font-weight:700;color:#F3F0E8;white-space:nowrap;line-height:1.15;}#e31-s{position:absolute;left:960.0px;top:712.8000000000001px;font-size:44.0px;font-weight:800;color:#F3F0E8;white-space:nowrap;line-height:1.15;}
+</style>
+<div id="root" data-composition-id="e31" data-width="1920" data-height="1080">
+<div id="e31-logo"><span>Commerce</span><span style="color:#FFB224">Guard</span></div><div id="e31-v"><div style="transform:translateX(-50%)">Version 2 · from one model to a system</div></div><div id="e31-t"><div style="transform:translateX(-50%)">Predict risk. Understand behavior. Reduce preventable losses.</div></div><div id="e31-s"><div style="transform:translateX(-50%)">One step at a time. One model at a time.</div></div>
+</div>
+<script>
+const tl = gsap.timeline({paused:true});
+tl.fromTo("#e31-logo",{opacity:0,y:30},{opacity:1,y:0,duration:0.5,ease:"power3.out"},0.3);tl.fromTo("#e31-logo span",{backgroundPosition:"100% 0"},{backgroundPosition:"0% 0",duration:1.3,ease:"power2.inOut"},1.00);tl.fromTo("#e31-v",{opacity:0,y:20},{opacity:1,y:0,duration:0.5,ease:"power3.out"},2.23);tl.fromTo("#e31-t",{opacity:0,y:20},{opacity:1,y:0,duration:0.5,ease:"power3.out"},6.45);tl.fromTo("#e31-s",{opacity:0,y:20},{opacity:1,y:0,duration:0.5,ease:"power3.out"},3.2);
+window.__timelines["e31"] = tl;
+</script>
+</template>

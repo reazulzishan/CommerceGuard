@@ -1,0 +1,16 @@
+<template>
+<style>
+#root{position:absolute;inset:0;overflow:hidden;background:#141517;background-image:linear-gradient(rgba(255,255,255,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.035) 1px,transparent 1px);background-size:120px 120px;
+ font-family:Inter,sans-serif;color:#F3F0E8;}
+#root .mono{font-family:'JetBrains Mono',monospace;}
+#e13-aura0{position:absolute;left:162.39999999999998px;top:64.0px;width:520.0px;height:520.0px;border-radius:50%;background:#FFB224;opacity:.16;filter:blur(110.0px);}#e13-aura1{position:absolute;left:1237.6000000000001px;top:496.0px;width:520.0px;height:520.0px;border-radius:50%;background:#3CC6A4;opacity:.16;filter:blur(110.0px);}#e13-core{position:absolute;left:810.0px;top:346.8px;width:300.0px;height:300.0px;background:rgba(255,255,255,.07);border:2px solid rgba(255,255,255,.18);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);box-shadow:inset 0 1px 0 rgba(255,255,255,.22),0 24px 60px rgba(0,0,0,.45);border-radius:20px;border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:40.0px;}#e13-core small{font-size:30.0px;color:#FFB224;}#e13-md0{left:960.0px;top:166.8px;}#e13-md1{left:1331.5248982235241px;top:661.8px;}#e13-md2{left:588.4751017764759px;top:661.8000000000002px;}#root .mod{position:absolute;white-space:nowrap;padding:18.0px 30.0px;font-size:36.0px;font-weight:800;background:rgba(255,255,255,.07);border:2px solid rgba(255,255,255,.18);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);box-shadow:inset 0 1px 0 rgba(255,255,255,.22),0 24px 60px rgba(0,0,0,.45);border-radius:20px;}
+</style>
+<div id="root" data-composition-id="e13" data-width="1920" data-height="1080">
+<div id="e13-aura0"></div><div id="e13-aura1"></div><div id="e13-core"><b>Commerce<span style="color:#FFB224">Guard</span></b><small>v2</small></div><div id="e13-md0" class="mod">1 · Customer voice</div><div id="e13-md1" class="mod">2 · Order risk</div><div id="e13-md2" class="mod">3 · Delivery risk (Ep 1)</div>
+</div>
+<script>
+const tl = gsap.timeline({paused:true});
+tl.fromTo("#e13-aura0",{x:0,y:0},{x:90.0,y:-50.0,duration:10.80,ease:"sine.inOut"},0);tl.fromTo("#e13-aura1",{x:0,y:0},{x:-80.0,y:60.0,duration:10.80,ease:"sine.inOut"},0);tl.fromTo("#e13-core",{opacity:0,y:30},{opacity:1,y:0,duration:0.5,ease:"power3.out"},0.2);tl.fromTo("#e13-md0",{opacity:0,scale:.6,xPercent:-50,yPercent:-50},{opacity:1,scale:1,xPercent:-50,yPercent:-50,duration:.45,ease:"back.out(1.5)"},2.66);tl.fromTo("#e13-md1",{opacity:0,scale:.6,xPercent:-50,yPercent:-50},{opacity:1,scale:1,xPercent:-50,yPercent:-50,duration:.45,ease:"back.out(1.5)"},5.11);tl.fromTo("#e13-md2",{opacity:0,scale:.6,xPercent:-50,yPercent:-50},{opacity:1,scale:1,xPercent:-50,yPercent:-50,duration:.45,ease:"back.out(1.5)"},7.53);
+window.__timelines["e13"] = tl;
+</script>
+</template>

@@ -1,0 +1,177 @@
+[
+ {
+  "i": 0,
+  "type": "markdown",
+  "start": 4.39,
+  "end": 5.93,
+  "text": "# CommerceGuard \u00b7 Episode 2\n## From one model to a risk system\n1. **Customer voice** (Bangladesh): Daraz + Pickaboo reviews, Bangla and English. Who is about to become an unhappy customer?\n2. **Order "
+ },
+ {
+  "i": 1,
+  "type": "markdown",
+  "start": 5.93,
+  "end": 7.47,
+  "text": "## Setup"
+ },
+ {
+  "i": 2,
+  "type": "code",
+  "start": 7.47,
+  "end": 11.36,
+  "text": "import re, numpy as np, pandas as pd, matplotlib.pyplot as plt, seaborn as sns\nfrom sklearn.metrics import average_precision_score, roc_auc_score, f1_score, precision_recall_curve\npd.set_option(\"displ"
+ },
+ {
+  "i": 3,
+  "type": "markdown",
+  "start": 11.36,
+  "end": 12.89,
+  "text": "# Model 1 \u00b7 Customer voice (Bangladesh)"
+ },
+ {
+  "i": 4,
+  "type": "code",
+  "start": 12.89,
+  "end": 14.53,
+  "text": "r = pd.read_csv(RAW + \"bd_reviews.csv\")\nprint(r.shape)\nprint(r[\"Emotion\"].value_counts().to_dict())\nprint(r[\"Data Source\"].value_counts().to_dict())\nbangla = r[\"Review\"].astype(str).str.contains(r\"[\\u"
+ },
+ {
+  "i": 5,
+  "type": "code",
+  "start": 14.53,
+  "end": 16.09,
+  "text": "# Trap 1: the same review text appears many times. Keep one copy.\nprint(\"duplicate texts:\", r[\"Review\"].duplicated().sum())\nr = r.drop_duplicates(\"Review\").reset_index(drop=True)\nr[\"y\"] = (r[\"Sentimen"
+ },
+ {
+  "i": 6,
+  "type": "code",
+  "start": 16.09,
+  "end": 17.78,
+  "text": "# What do unhappy Bangladeshi customers talk about? (keyword share, Bangla + English)\ntopics = {\n    \"delivery / late\": r\"deliver|late|\u09a1\u09c7\u09b2\u09bf\u09ad\u09be\u09b0\u09bf|\u09a6\u09c7\u09b0\u09bf|\u09a6\u09c7\u09b0\u09bf\u09a4\u09c7|\u09aa\u09cc\u0981\u099b\",\n    \"fake / not original\": r\"fake|dup"
+ },
+ {
+  "i": 7,
+  "type": "code",
+  "start": 17.78,
+  "end": 19.46,
+  "text": "fig, ax = plt.subplots(figsize=(9, 4.5))\ns = share.sort_values(\"unhappy\")\nax.barh(s.index, s[\"unhappy\"], color=\"#FF5C4D\", label=\"unhappy reviews\")\nax.barh(s.index, s[\"happy\"], color=\"#3CC6A4\", alpha=."
+ },
+ {
+  "i": 8,
+  "type": "code",
+  "start": 19.46,
+  "end": 21.09,
+  "text": "# Trap 2: reviews of the same product share words and labels. Split by PRODUCT, never by row.\nfrom sklearn.model_selection import GroupShuffleSplit\ng = r[\"Product Name\"].astype(str)\ngss = GroupShuffle"
+ },
+ {
+  "i": 9,
+  "type": "code",
+  "start": 21.09,
+  "end": 29.09,
+  "text": "# Text only. The star rating is NOT a feature: at prediction time (a chat message) there is no rating.\nfrom sklearn.pipeline import make_pipeline, make_union\nfrom sklearn.feature_extraction.text impor"
+ },
+ {
+  "i": 10,
+  "type": "code",
+  "start": 29.09,
+  "end": 31.86,
+  "text": "voice = voice_models[\"Logistic Regression\"]\nsva = voice.predict_proba(rva[\"Review\"].astype(str))[:, 1]\nth = max(np.linspace(.05, .95, 91), key=lambda t: f1_score(rva[\"y\"], sva >= t))   # threshold cho"
+ },
+ {
+  "i": 11,
+  "type": "code",
+  "start": 31.86,
+  "end": 33.48,
+  "text": "# Which words push a message toward 'unhappy'? (word part of the model)\nlr = voice.named_steps[\"logisticregression\"]; fu = voice.named_steps[\"featureunion\"]\nnames = np.concatenate([fu.transformer_list"
+ },
+ {
+  "i": 12,
+  "type": "markdown",
+  "start": 33.48,
+  "end": 35.01,
+  "text": "# Model 2 \u00b7 Order risk in a cash-on-delivery market"
+ },
+ {
+  "i": 13,
+  "type": "code",
+  "start": 35.01,
+  "end": 37.54,
+  "text": "p = pd.read_csv(RAW + \"Pakistan Largest Ecommerce Dataset.csv\", low_memory=False).dropna(how=\"all\")\np = p.rename(columns={\"Customer ID\": \"customer_id\", \"Customer Since\": \"customer_since\"})\nprint(p.sha"
+ },
+ {
+  "i": 14,
+  "type": "code",
+  "start": 37.54,
+  "end": 39.51,
+  "text": "# Clean outcomes only. \"cod\", \"paid\", \"pending\"... are not outcomes (the column mixes fields): drop them.\nOUT = {\"complete\": \"ok\", \"received\": \"ok\", \"closed\": \"ok\", \"canceled\": \"cancel\", \"order_refund"
+ },
+ {
+  "i": 15,
+  "type": "code",
+  "start": 39.51,
+  "end": 41.28,
+  "text": "# The cash-on-delivery question, in one table\ntab = p.groupby(p[\"is_cod\"].map({1: \"Cash on delivery\", 0: \"Paid online\"})).agg(\n    items=(\"outcome\", \"size\"), cancelled=(\"y_cancel\", \"mean\"), refunded=("
+ },
+ {
+  "i": 16,
+  "type": "code",
+  "start": 41.28,
+  "end": 43.58,
+  "text": "# Customer history from the PAST only.\n# Cancellations are known within days, so count orders from strictly earlier dates.\n# Refunds can take weeks, so only count refunds on orders placed 30+ days ear"
+ },
+ {
+  "i": 17,
+  "type": "code",
+  "start": 43.58,
+  "end": 45.18,
+  "text": "LEAKY = [\"status\", \"outcome\", \"BI Status\", \"Working Date\", \" MV \", \"y_cancel\", \"y_refund\", \"increment_id\"]\nNUM = [\"price\", \"qty_ordered\", \"log_total\", \"discount_ratio\", \"is_cod\", \"prev_n\", \"prev_cance"
+ },
+ {
+  "i": 18,
+  "type": "code",
+  "start": 45.18,
+  "end": 53.86,
+  "text": "import lightgbm as lgb\ndef train(target, Xtr, ytr, Xva, yva):\n    m = lgb.LGBMClassifier(n_estimators=3000, learning_rate=0.04, num_leaves=63, min_child_samples=100, subsample=0.8, subsample_freq=1,\n "
+ },
+ {
+  "i": 19,
+  "type": "code",
+  "start": 53.86,
+  "end": 55.59,
+  "text": "from sklearn.isotonic import IsotonicRegression\ncal = {}\nfor tgt, m in risk_models.items():\n    va_ = pva if tgt == \"y_cancel\" else pva[pva.y_cancel == 0]\n    cal[tgt] = IsotonicRegression(out_of_boun"
+ },
+ {
+  "i": 20,
+  "type": "code",
+  "start": 55.59,
+  "end": 58.36,
+  "text": "import shap\nsmp = pte[FEAT].sample(4000, random_state=SEED)\nsv = shap.TreeExplainer(risk_models[\"y_cancel\"]).shap_values(smp)\nsv = sv[1] if isinstance(sv, list) else sv\nplt.figure(); shap.summary_plot"
+ },
+ {
+  "i": 21,
+  "type": "markdown",
+  "start": 58.36,
+  "end": 59.89,
+  "text": "# CommerceGuard engine \u00b7 one ranked list"
+ },
+ {
+  "i": 22,
+  "type": "code",
+  "start": 59.89,
+  "end": 61.68,
+  "text": "# Expected loss per order item = P(cancel) x handling cost + P(refund) x (refund cost). Costs are illustrative inputs, not data.\nCOST_CANCEL, COST_REFUND_SHARE = 150, 0.15   # Rs per cancelled item, 1"
+ },
+ {
+  "i": 23,
+  "type": "code",
+  "start": 61.68,
+  "end": 63.21,
+  "text": "# The chat from the video: real model scores for example messages (the messages are written for the demo).\nchat = [\"\u09ad\u09be\u0987, \u0985\u09b0\u09cd\u09a1\u09be\u09b0 \u0995\u09b0\u099b\u09bf, \u0995\u09cd\u09af\u09be\u09b6 \u0985\u09a8 \u09a1\u09c7\u09b2\u09bf\u09ad\u09be\u09b0\u09bf \u09a4\u09cb?\",\n        \"\u09e9 \u09a6\u09bf\u09a8 \u09b9\u09af\u09bc\u09c7 \u0997\u09c7\u09b2, \u098f\u0996\u09a8\u09cb \u09aa\u09a3\u09cd\u09af \u09aa\u09be\u0987\u09a8\u09bf\","
+ },
+ {
+  "i": 24,
+  "type": "markdown",
+  "start": 63.22,
+  "end": 64.77,
+  "text": "## Summary\n- Customer voice: text model on 64k unique Daraz + Pickaboo reviews, split by product.\n- Order risk: cancellation + refund models on real COD-market orders, time split, history from the pas"
+ }
+]

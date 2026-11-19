@@ -12,11 +12,12 @@ import nbformat
 from playwright.sync_api import sync_playwright
 
 ROOT = Path(__file__).resolve().parents[1]
-REC = ROOT / "recording"
-SRC = ROOT / "notebooks/01_commerceguard_delivery_risk.ipynb"
-LIVE = ROOT / "notebooks/01_live.ipynb"
+import sys
+REC = ROOT / (sys.argv[1] if len(sys.argv) > 1 else "recording")
+SRC = ROOT / (sys.argv[2] if len(sys.argv) > 2 else "notebooks/01_commerceguard_delivery_risk.ipynb")
+LIVE = ROOT / ("notebooks/" + SRC.stem + "_live.ipynb")
 PORT = 8899
-URL = f"http://localhost:{PORT}/lab/tree/notebooks/{LIVE.name}"
+URL = f"http://localhost:{PORT}/lab/tree/notebooks/{LIVE.name}?reset"
 
 # Start from a clean notebook so every output on screen is produced live.
 nb = nbformat.read(SRC, 4)
@@ -54,7 +55,11 @@ try:
         page.wait_for_function("() => document.querySelector('.jp-Notebook-ExecutionIndicator')?.getAttribute('data-status') === 'idle'", timeout=60000)
         page.keyboard.press("Meta+b")  # hide the file browser
         time.sleep(2)
-        page.locator(".jp-Notebook .jp-Cell").first.click()
+        for _ in range(3):  # dismiss any startup dialog (kernel picker, news) before starting
+            if page.locator(".jp-Dialog").count():
+                btn = page.locator(".jp-Dialog .jp-mod-accept")
+                (btn.first.click() if btn.count() else page.keyboard.press("Escape")); time.sleep(1)
+        page.locator(".jp-Notebook .jp-Cell").first.click(force=True)
         page.keyboard.press("Escape")  # command mode
 
         log = []

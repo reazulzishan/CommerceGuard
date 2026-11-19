@@ -12,7 +12,7 @@ try:
         except Exception: time.sleep(1)
     with sync_playwright() as pw:
         b = pw.chromium.launch(); ctx = b.new_context(viewport={"width": 1600, "height": 900}, device_scale_factor=2); p = ctx.new_page()
-        p.goto(f"http://localhost:{PORT}/lab/tree/notebooks/01_live.ipynb"); p.wait_for_selector(".jp-Notebook .jp-Cell", timeout=60000)
+        p.goto(f"http://localhost:{PORT}/lab/tree/notebooks/01_live.ipynb?reset"); p.wait_for_selector(".jp-Notebook .jp-Cell", timeout=60000)
         p.keyboard.press("Meta+b"); time.sleep(3)
         targets = json.loads((REC / "highlight_targets.json").read_text()); boxes = {}
         cells = p.locator(".jp-Notebook .jp-Cell").all()

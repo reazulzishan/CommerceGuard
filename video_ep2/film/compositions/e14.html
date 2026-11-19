@@ -1,0 +1,16 @@
+<template>
+<style>
+#root{position:absolute;inset:0;overflow:hidden;background:#141517;background-image:linear-gradient(rgba(255,255,255,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.035) 1px,transparent 1px);background-size:120px 120px;
+ font-family:Inter,sans-serif;color:#F3F0E8;}
+#root .mono{font-family:'JetBrains Mono',monospace;}
+#e14-chap{position:absolute;left:153.6px;top:86.4px;font-size:32.0px;font-weight:800;color:#FFB224;white-space:nowrap;line-height:1.15;}#e14-chap{z-index:10;}#e14-chap>div{background:rgba(20,21,23,.85);padding:6.0px 14.0px;border-radius:8.0px;margin-left:-14.0px;}#e14-ds{left:115.19999999999999px;top:183.60000000000002px;width:1689.6px;}#root .dsc{position:absolute;padding:24.0px 30.0px;background:rgba(255,255,255,.07);border:2px solid rgba(255,255,255,.18);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);box-shadow:inset 0 1px 0 rgba(255,255,255,.22),0 24px 60px rgba(0,0,0,.45);border-radius:20px;}#root .dsc b{display:block;font-size:48.0px;}#root .dsc span{display:block;font-size:34.0px;color:#FFB224;margin-top:8.0px;}#root .dsc small{display:block;font-size:28.0px;color:#8B8A86;margin-top:8.0px;}#e14-cam0{position:absolute;left:0;top:0;width:1920px;height:1080px;}#e14-sheet0{position:absolute;left:192.0px;top:382.0992px;width:1536.0px;border-radius:14.0px;box-shadow:0 40.0px 90.0px rgba(0,0,0,.55);background:#fff;}#root .hl{position:absolute;border:5.0px solid #FFB224;border-radius:8.0px;opacity:0;box-shadow:0 0 0 4000.0px rgba(20,21,23,.5);}#e14-hl0_0{left:290.9184px;top:659.1936px;width:276.47999999999996px;height:36.864px;}
+</style>
+<div id="root" data-composition-id="e14" data-width="1920" data-height="1080">
+<div id="e14-chap"><div style="transform:translateX(0)">MODEL 1 · CUSTOMER VOICE (BANGLADESH)</div></div><div id="e14-ds" class="dsc"><b>Daraz + Pickaboo reviews</b><span>78,130 reviews · Bangla + English · 2023</span><small>Rashid et al., Mendeley Data · CC BY 4.0</small></div><div id="e14-cam0"><img id="e14-sheet0" src="assets/cells/cell_04.png"/><div id="e14-hl0_0" class="hl"></div></div>
+</div>
+<script>
+const tl = gsap.timeline({paused:true});
+tl.fromTo("#e14-ds",{opacity:0,y:30},{opacity:1,y:0,duration:0.5,ease:"power3.out"},0.3);tl.fromTo("#e14-cam0",{opacity:0,y:40.0},{opacity:1,y:0,duration:.5,ease:"power3.out"},5.42);tl.set("#e14-cam0",{transformOrigin:"0 0"},0);tl.to("#e14-cam0",{x:273.3,y:-565.8,scale:1.600,duration:.9,ease:"sine.inOut"},7.28);tl.fromTo("#e14-hl0_0",{opacity:0,scaleX:.6},{opacity:1,scaleX:1,duration:.3,ease:"power3.out"},8.13);
+window.__timelines["e14"] = tl;
+</script>
+</template>
