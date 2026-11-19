@@ -1,0 +1,16 @@
+<template>
+<style>
+#root{position:absolute;inset:0;overflow:hidden;background:#141517;background-image:linear-gradient(rgba(255,255,255,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.035) 1px,transparent 1px);background-size:120px 120px;
+ font-family:Inter,sans-serif;color:#F3F0E8;}
+#root .mono{font-family:'JetBrains Mono',monospace;}
+#s18-lock{position:absolute;left:0;right:0;top:302.40000000000003px;text-align:center;font-size:180.0px;}#s18-cal{position:absolute;left:960.0px;top:626.4px;font-size:44.0px;font-weight:700;color:#F3F0E8;white-space:nowrap;line-height:1.15;}#s18-once{position:absolute;left:960.0px;top:734.4000000000001px;font-size:70.0px;font-weight:800;color:#FFB224;white-space:nowrap;line-height:1.15;}
+</style>
+<div data-hf-id="hf-tg11" id="root" data-composition-id="s18" data-width="1920" data-height="1080">
+<div data-hf-id="hf-l1ke" id="s18-lock">🔒</div><div data-hf-id="hf-7xd0" id="s18-cal"><div data-hf-id="hf-j4np" style="transform:translateX(-50%)">Scores calibrated on validation</div></div><div data-hf-id="hf-2o9v" id="s18-once"><div data-hf-id="hf-kdt2" style="transform:translateX(-50%)">TEST SET · OPENED ONCE</div></div>
+</div>
+<script>
+const tl = gsap.timeline({paused:true});
+tl.fromTo("#s18-lock",{opacity:0,y:30},{opacity:1,y:0,duration:0.5,ease:"power3.out"},0.3);tl.to("#s18-lock",{rotate:-12,scale:1.1,duration:.3,ease:"power2.out"},6.89);tl.call(()=>{},[],6.89);tl.fromTo("#s18-cal",{opacity:0,y:20},{opacity:1,y:0,duration:0.5,ease:"power3.out"},0.41);tl.fromTo("#s18-once",{opacity:0,y:20},{opacity:1,y:0,duration:0.5,ease:"power3.out"},7.66);
+window.__timelines["s18"] = tl;
+</script>
+</template>

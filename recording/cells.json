@@ -1,0 +1,352 @@
+[
+ {
+  "i": 0,
+  "type": "markdown",
+  "start": 3.09,
+  "end": 4.64,
+  "text": "# CommerceGuard \u00b7 Episode 1\n## Will this order arrive on time?\nPredict, **at checkout**, whether the delivery date promised to the customer will be broken,\nand find a better date to promise. Data: Oli"
+ },
+ {
+  "i": 1,
+  "type": "markdown",
+  "start": 4.64,
+  "end": 6.18,
+  "text": "## Phase 0 \u00b7 Problem definition"
+ },
+ {
+  "i": 2,
+  "type": "code",
+  "start": 6.18,
+  "end": 7.72,
+  "text": "PROBLEM = {\n    \"unit\": \"one order\",\n    \"prediction_time\": \"order placement (checkout)\",\n    \"target\": \"is_late = delivered after the promised date\",\n    \"task\": \"binary classification + promise-date"
+ },
+ {
+  "i": 3,
+  "type": "markdown",
+  "start": 7.72,
+  "end": 9.26,
+  "text": "## Phase 1 \u00b7 Data understanding"
+ },
+ {
+  "i": 4,
+  "type": "code",
+  "start": 9.26,
+  "end": 13.19,
+  "text": "import numpy as np, pandas as pd, matplotlib.pyplot as plt, seaborn as sns\npd.set_option(\"display.width\", 140); sns.set_theme(style=\"whitegrid\")\nSEED = 42\nRAW = \"../data/raw/\"\nFIG = \"../reports/figure"
+ },
+ {
+  "i": 5,
+  "type": "code",
+  "start": 13.2,
+  "end": 14.74,
+  "text": "orders = t[\"orders\"]\nprint(orders[\"order_status\"].value_counts())\norders.head(3)"
+ },
+ {
+  "i": 6,
+  "type": "code",
+  "start": 14.74,
+  "end": 16.37,
+  "text": "# The trap: customer_id is new for every order. The real person is customer_unique_id.\nc = t[\"customers\"]\nprint(\"customer_id per order unique:\", orders[\"customer_id\"].is_unique)\nper_person = orders.me"
+ },
+ {
+  "i": 7,
+  "type": "markdown",
+  "start": 16.37,
+  "end": 17.9,
+  "text": "## Phase 2 \u00b7 Cleaning & order reconstruction (one row = one order)"
+ },
+ {
+  "i": 8,
+  "type": "code",
+  "start": 17.9,
+  "end": 19.49,
+  "text": "ts = [\"order_purchase_timestamp\", \"order_approved_at\", \"order_delivered_carrier_date\",\n      \"order_delivered_customer_date\", \"order_estimated_delivery_date\"]\no = orders.copy()\no[ts] = o[ts].apply(pd."
+ },
+ {
+  "i": 9,
+  "type": "code",
+  "start": 19.5,
+  "end": 21.03,
+  "text": "# Very few orders before 2017, and the last months are not fully delivered yet (they'd bias the test set).\nSTART, END = \"2017-01-01\", \"2018-08-01\"  # July 2018 is kept aside as a never-touched holdout"
+ },
+ {
+  "i": 10,
+  "type": "code",
+  "start": 21.03,
+  "end": 22.74,
+  "text": "items = t[\"order_items\"].merge(t[\"products\"], on=\"product_id\", how=\"left\")\nitems[\"volume_cm3\"] = items[\"product_length_cm\"] * items[\"product_height_cm\"] * items[\"product_width_cm\"]\nit = items.groupby("
+ },
+ {
+  "i": 11,
+  "type": "markdown",
+  "start": 22.74,
+  "end": 24.28,
+  "text": "## Phase 3 \u00b7 Target engineering"
+ },
+ {
+  "i": 12,
+  "type": "code",
+  "start": 24.28,
+  "end": 25.83,
+  "text": "df[\"is_late\"] = (df[\"order_delivered_customer_date\"].dt.normalize() > df[\"order_estimated_delivery_date\"]).astype(int)\ndf[\"promised_days\"] = (df[\"order_estimated_delivery_date\"] - df[\"order_purchase_t"
+ },
+ {
+  "i": 13,
+  "type": "code",
+  "start": 25.83,
+  "end": 27.54,
+  "text": "fig, ax = plt.subplots(figsize=(9, 4.5))\nax.hist(df[\"promised_days\"].clip(0, 60), bins=60, alpha=.6, label=\"promised\")\nax.hist(df[\"actual_days\"].clip(0, 60), bins=60, alpha=.6, label=\"actual\")\nax.set("
+ },
+ {
+  "i": 14,
+  "type": "markdown",
+  "start": 27.54,
+  "end": 29.08,
+  "text": "## Phase 4 \u00b7 EDA"
+ },
+ {
+  "i": 15,
+  "type": "code",
+  "start": 29.08,
+  "end": 30.84,
+  "text": "fig, axes = plt.subplots(1, 2, figsize=(12, 4.5))\nst = df.groupby(\"customer_state\")[\"is_late\"].agg([\"mean\", \"size\"]).query(\"size > 500\").sort_values(\"mean\")\nst[\"mean\"].plot.barh(ax=axes[0], title=\"Lat"
+ },
+ {
+  "i": 16,
+  "type": "markdown",
+  "start": 30.84,
+  "end": 32.38,
+  "text": "## Phase 5 \u00b7 Feature engineering (checkout-time only)"
+ },
+ {
+  "i": 17,
+  "type": "code",
+  "start": 32.38,
+  "end": 33.96,
+  "text": "g = t[\"geolocation\"].groupby(\"geolocation_zip_code_prefix\")[[\"geolocation_lat\", \"geolocation_lng\"]].mean()\nfor who, col in [(\"cust\", \"customer_zip_code_prefix\"), (\"sell\", \"seller_zip_code_prefix\")]:\n "
+ },
+ {
+  "i": 18,
+  "type": "code",
+  "start": 33.96,
+  "end": 35.53,
+  "text": "# Seller's past late rate, using ONLY deliveries that had already happened before this order was placed.\ndf = df.sort_values(\"order_purchase_timestamp\").reset_index(drop=True)\nev = df[[\"seller_id\", \"o"
+ },
+ {
+  "i": 19,
+  "type": "markdown",
+  "start": 35.53,
+  "end": 37.06,
+  "text": "## Phase 5b \u00b7 Leakage audit"
+ },
+ {
+  "i": 20,
+  "type": "code",
+  "start": 37.06,
+  "end": 38.61,
+  "text": "LEAKY = [\"order_approved_at\", \"order_delivered_carrier_date\", \"order_delivered_customer_date\",\n         \"actual_days\", \"order_status\", \"review_score\"]\nNUM = [\"promised_days\", \"n_items\", \"price\", \"frei"
+ },
+ {
+  "i": 21,
+  "type": "markdown",
+  "start": 38.61,
+  "end": 40.15,
+  "text": "## Phase 6 \u00b7 Chronological split (70 / 15 / 15)"
+ },
+ {
+  "i": 22,
+  "type": "code",
+  "start": 40.15,
+  "end": 41.69,
+  "text": "fresh = df[df[\"order_purchase_timestamp\"] >= \"2018-07-01\"]  # locked away until Experiment 2\nbase = df[df[\"order_purchase_timestamp\"] < \"2018-07-01\"]\nn = len(base); a, b = int(n * .70), int(n * .85)\nt"
+ },
+ {
+  "i": 23,
+  "type": "markdown",
+  "start": 41.69,
+  "end": 43.22,
+  "text": "## Phase 7 \u00b7 Baseline: Logistic Regression"
+ },
+ {
+  "i": 24,
+  "type": "code",
+  "start": 43.22,
+  "end": 45.58,
+  "text": "from sklearn.pipeline import make_pipeline\nfrom sklearn.compose import make_column_transformer\nfrom sklearn.impute import SimpleImputer\nfrom sklearn.preprocessing import StandardScaler, OneHotEncoder\n"
+ },
+ {
+  "i": 25,
+  "type": "markdown",
+  "start": 45.58,
+  "end": 47.11,
+  "text": "## Phase 8 \u00b7 LightGBM"
+ },
+ {
+  "i": 26,
+  "type": "code",
+  "start": 47.11,
+  "end": 49.73,
+  "text": "import lightgbm as lgb\ngbm = lgb.LGBMClassifier(n_estimators=2000, learning_rate=0.03, num_leaves=31, min_child_samples=50,\n                         subsample=0.8, subsample_freq=1, colsample_bytree=0"
+ },
+ {
+  "i": 27,
+  "type": "markdown",
+  "start": 49.73,
+  "end": 51.26,
+  "text": "## Phase 9 \u00b7 Calibration (fit on validation, never on test)"
+ },
+ {
+  "i": 28,
+  "type": "code",
+  "start": 51.26,
+  "end": 52.81,
+  "text": "from sklearn.isotonic import IsotonicRegression\nfrom sklearn.calibration import calibration_curve\niso = IsotonicRegression(out_of_bounds=\"clip\").fit(gbm.predict_proba(Xva)[:, 1], yva)\ncalibrated = lam"
+ },
+ {
+  "i": 29,
+  "type": "markdown",
+  "start": 52.81,
+  "end": 54.33,
+  "text": "## Phase 10 \u00b7 Final test (used once)"
+ },
+ {
+  "i": 30,
+  "type": "code",
+  "start": 54.33,
+  "end": 55.91,
+  "text": "s_lr, s_raw, s_cal = lr.predict_proba(Xte)[:, 1], gbm.predict_proba(Xte)[:, 1], calibrated(Xte)\nfinal = pd.DataFrame([report(\"Logistic Regression\", yte, s_lr), report(\"LightGBM\", yte, s_raw),\n        "
+ },
+ {
+  "i": 31,
+  "type": "code",
+  "start": 55.91,
+  "end": 57.63,
+  "text": "from sklearn.metrics import precision_recall_curve\nfig, axes = plt.subplots(1, 2, figsize=(12, 4.8))\nfor name, s in [(\"Logistic Regression\", s_lr), (\"LightGBM\", s_raw)]:\n    pr, rc, _ = precision_reca"
+ },
+ {
+  "i": 32,
+  "type": "markdown",
+  "start": 57.63,
+  "end": 59.16,
+  "text": "## Phase 11 \u00b7 Risk bands for review priority"
+ },
+ {
+  "i": 33,
+  "type": "code",
+  "start": 59.16,
+  "end": 60.7,
+  "text": "bands = pd.cut(s_cal, [0, .05, .15, .30, 1], labels=[\"Low\", \"Moderate\", \"High\", \"Very high\"], include_lowest=True)\npd.DataFrame({\"band\": bands, \"late\": yte.values}).groupby(\"band\", observed=True)[\"lat"
+ },
+ {
+  "i": 34,
+  "type": "markdown",
+  "start": 60.7,
+  "end": 62.22,
+  "text": "## Phase 12 \u00b7 Explainability (SHAP)"
+ },
+ {
+  "i": 35,
+  "type": "code",
+  "start": 62.22,
+  "end": 64.64,
+  "text": "import shap\nsample = Xte.sample(3000, random_state=SEED)\nsv = shap.TreeExplainer(gbm).shap_values(sample)\nsv = sv[1] if isinstance(sv, list) else sv\nplt.figure(); shap.summary_plot(sv, sample, plot_ty"
+ },
+ {
+  "i": 36,
+  "type": "code",
+  "start": 64.64,
+  "end": 66.44,
+  "text": "i = int(np.argmax(gbm.predict_proba(sample)[:, 1]))\nexp = shap.TreeExplainer(gbm)(sample.iloc[[i]])\nplt.figure(); shap.plots.waterfall(exp[0], max_display=10, show=False)\nplt.tight_layout(); plt.savef"
+ },
+ {
+  "i": 37,
+  "type": "markdown",
+  "start": 66.44,
+  "end": 67.97,
+  "text": "## Phase 13 \u00b7 Better promise: quantile regression on delivery days"
+ },
+ {
+  "i": 38,
+  "type": "code",
+  "start": 67.97,
+  "end": 88.84,
+  "text": "NUM_P = [c for c in NUM if c != \"promised_days\"]\ndef fit_q(alpha):\n    q = lgb.LGBMRegressor(objective=\"quantile\", alpha=alpha, n_estimators=600, learning_rate=0.05,\n                          num_leav"
+ },
+ {
+  "i": 39,
+  "type": "code",
+  "start": 88.84,
+  "end": 90.42,
+  "text": "ml_promise = np.ceil(q.predict(test[NUM_P + CAT]))\ncmp = pd.DataFrame({\n    \"promise\": [\"Olist today\", \"CommerceGuard\"],\n    \"mean promised days\": [test[\"promised_days\"].mean(), ml_promise.mean()],\n  "
+ },
+ {
+  "i": 40,
+  "type": "code",
+  "start": 90.42,
+  "end": 92.06,
+  "text": "fig, ax = plt.subplots(figsize=(9, 4.5))\nax.hist((test[\"promised_days\"] - test[\"actual_days\"]).clip(-20, 40), bins=60, alpha=.6, label=\"Olist promise - actual\")\nax.hist((ml_promise - test[\"actual_days"
+ },
+ {
+  "i": 41,
+  "type": "markdown",
+  "start": 92.06,
+  "end": 93.59,
+  "text": "## Experiment 1 failed. Why?\nValidation (Mar-Apr 2018) was a late-heavy period, test (May-Jun 2018) was calm.\nThe model had no way to know \"how is delivery going right now\"."
+ },
+ {
+  "i": 42,
+  "type": "code",
+  "start": 93.59,
+  "end": 95.21,
+  "text": "wk = base.groupby(base[\"order_purchase_timestamp\"].dt.to_period(\"W\"))[\"is_late\"].mean()\nfig, ax = plt.subplots(figsize=(10, 4)); wk.plot(ax=ax, marker=\".\")\nfor (lo, hi, lab) in [(val, None, \"val\"), (t"
+ },
+ {
+  "i": 43,
+  "type": "markdown",
+  "start": 95.21,
+  "end": 96.74,
+  "text": "## Experiment 2 \u00b7 Add 'how late is delivery right now' (known at checkout)"
+ },
+ {
+  "i": 44,
+  "type": "code",
+  "start": 96.74,
+  "end": 98.37,
+  "text": "# Late rate of deliveries COMPLETED in the 30 days before each order was placed (overall and to the customer's state).\ndef recent_late(df, by=None, days=30):\n    out = pd.Series(np.nan, index=df.index"
+ },
+ {
+  "i": 45,
+  "type": "code",
+  "start": 98.37,
+  "end": 119.46,
+  "text": "gbm2 = lgb.LGBMClassifier(n_estimators=2000, learning_rate=0.03, num_leaves=31, min_child_samples=50,\n                          subsample=0.8, subsample_freq=1, colsample_bytree=0.8, random_state=SEED"
+ },
+ {
+  "i": 46,
+  "type": "markdown",
+  "start": 119.46,
+  "end": 120.99,
+  "text": "## Final check on July 2018: never seen by any model or choice"
+ },
+ {
+  "i": 47,
+  "type": "code",
+  "start": 120.99,
+  "end": 122.57,
+  "text": "yf = fresh[\"is_late\"]\nffinal = pd.DataFrame([report(\"Exp 1 LightGBM\", yf, gbm.predict_proba(fresh[FEATURES])[:, 1]),\n                       report(\"Exp 2 LightGBM + recent-late\", yf, gbm2.predict_prob"
+ },
+ {
+  "i": 48,
+  "type": "code",
+  "start": 122.57,
+  "end": 124.17,
+  "text": "fig, ax = plt.subplots(figsize=(8, 4.5))\nax.bar(fprom[\"promise\"], fprom[\"mean promised days\"], color=[\"#888\", \"#e76f51\", \"#2a9d8f\"])\nfor i, r in fprom.iterrows():\n    ax.text(i, r[\"mean promised days\""
+ },
+ {
+  "i": 49,
+  "type": "markdown",
+  "start": 124.17,
+  "end": 125.72,
+  "text": "## Summary\n- One row per order, checkout-time features only, chronological split, test used once.\n- Limits: Brazil data (not COD / Bangladesh); \"late\" is not \"failed\"; customer history is almost empty"
+ }
+]
