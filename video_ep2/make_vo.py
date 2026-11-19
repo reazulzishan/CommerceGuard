@@ -14,7 +14,7 @@ meta = json.loads((here / "vo/scenes.json").read_text()) if (here / "vo/scenes.j
 for sid, part, text in [(a, int(b), c) for a, b, c in items] + [(a, 0, b) for a, b in outs]:
     if only and sid not in only: continue
     text = " ".join(text.split())
-    t2 = text.replace("Evaly", "Ee-vaa-lee").replace("e-Orange", "ee Orange").replace("Pickaboo", "Picka-boo").replace("Daraz", "Da-raaz")
+    t2 = text.replace("Evaly", "Ee-vaa-lee").replace("e-Orange", "ee Orange").replace("Pickaboo", "Picka-boo").replace("Daraz", "Da-raaz").replace("Valo na", "Bhaalo naa").replace("kharap na", "khaa-raap naa")
     w = np.asarray(tts.tts(text=prep(t2), speaker=SPEAKER), dtype=np.float32)
     sf.write(here / f"vo/{sid}.wav", w, sr)
     meta[sid] = {"id": sid, "part": part, "text": text, "dur": round(len(w) / sr, 2)}

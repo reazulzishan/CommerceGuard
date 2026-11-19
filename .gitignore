@@ -38,3 +38,15 @@ recording_ep2/*.webm
 recording_ep2/_video/
 recording_ep2/lab-settings/
 video_ep2/*.log
+# AI-tool boilerplate from the video toolkit (not part of the project)
+CLAUDE.md
+AGENTS.md
+.claude/
+# licensed media: music and sound effects are not redistributable as files
+**/assets/music/
+**/assets/sfx/
+**/assets/footage/
+# build outputs
+video_ep2/full_vertical/
+video_ep2/shorts/
+recording_ep2/boxes.before.json

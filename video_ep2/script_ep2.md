@@ -96,6 +96,19 @@ The honest limits: reviews are a proxy for complaints, the order data is from Pa
 [E31] PART 3
 That is CommerceGuard, version two. One step at a time. One model at a time. Predict risk. Understand behavior. Reduce preventable losses.
 
-# Reel outro hooks (2 parts)
-[F1] Next part: does it work on products it has never seen? And the order model that found Rafi's problem.
-[F2] The full episode is on YouTube. Search CS Funda official.
+[E32] PART 2
+What did it learn? Look inside. Valo na, not good, pushes a message toward unhappy. But kharap na, not bad, is one of the strongest happy signals. One small word flips the meaning, and the model learned that.
+
+[E33] PART 2
+Here is the full picture. The amber curve is the model. The grey line is random guessing. Even when it finds almost sixty percent of the unhappy reviews, it is still right eight times out of ten.
+
+[E34] PART 3
+But can we trust the percentages? I sorted the test orders into ten groups. When the model says eighty eight percent, eighty nine percent were really cancelled. The dots follow the diagonal.
+
+[E35] PART 3
+And what drives cancellation risk? The payment method, by far. Then the discount, the order size, cash on delivery, and the customer's own past cancellations.
+
+# Reel outro hooks (3 parts)
+[F1] Next part: can machine learning hear an unhappy customer, in Bangla, before the parcel leaves?
+[F2] Next part: the order model, what really drives cancellations, and Rafi's chat, scored live.
+[F3] The full episode is on YouTube. Search CS Funda official.

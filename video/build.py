@@ -125,7 +125,8 @@ def chapter(sc, text, t=0.0):
     """Small chapter tag in the top-left, e.g. 'PHASE 3 · TARGET'."""
     x, y = (sc.W * 0.08, sc.H * 0.08) if not sc.P else (sc.W * 0.07, sc.H * 0.115)
     el = label(sc, "chap", text, x, y, size=32, color=AMB, t=t, weight=800, w=(sc.W * 0.86) if sc.P else None)
-    sc.css.append(f"#{el}{{z-index:10;}}#{el}>div{{background:rgba(20,21,23,.85);padding:{6 * sc.u}px {14 * sc.u}px;border-radius:{8 * sc.u}px;margin-left:{-14 * sc.u}px;}}")
+    sc.chap = el
+    sc.css.append(f"#{el}{{z-index:10;}}#{el}>div{{background:rgba(20,21,23,.97);box-shadow:0 0 {24 * sc.u}px rgba(0,0,0,.6);padding:{6 * sc.u}px {14 * sc.u}px;border-radius:{8 * sc.u}px;margin-left:{-14 * sc.u}px;}}")
 
 
 def capture(sc, segs):
@@ -134,7 +135,7 @@ def capture(sc, segs):
     for k, seg in enumerate(segs):
         c = seg["cell"]
         img = f"assets/cells/cell_{c:02d}.png"
-        iw, ih = 2500, seg["h"]
+        iw, ih = cell_size(c)  # stills differ per recording (Ep1 2500 px, Ep2 3004 px)
         Dw = W * (0.80 if not P else 0.96)
         f = Dw / iw
         Dh = ih * f
@@ -158,7 +159,7 @@ def capture(sc, segs):
             b = BOXES.get(str(c), {}).get(s)
             if not b:
                 print(f"  ! no box for cell {c} '{s}'"); continue
-            pad = 10
+            pad = 16
             bx, by, bw, bh = x0 + (b[0] - pad) * f, y0 + (b[1] - pad) * f, (b[2] + 2 * pad) * f, (b[3] + 2 * pad) * f
             hl = sc.id(f"hl{k}_{j}")
             sc.css.append(f"#{hl}{{left:{bx}px;top:{by}px;width:{bw}px;height:{bh}px;}}")
@@ -167,6 +168,8 @@ def capture(sc, segs):
             cx, cy = bx + bw / 2, by + bh / 2
             tx, ty = W / 2 - z * cx, H * (0.48 if not P else 0.45) - z * cy
             sc.js.append(f'tl.to("#{cam}",{{x:{tx:.1f},y:{ty:.1f},scale:{z:.3f},duration:.9,ease:"sine.inOut"}},{max(s0, t - 0.6):.2f});')
+            if j == 0 and k == 0 and getattr(sc, "chap", None) and z > 1.05:  # zoomed code would slide under the chapter tag
+                sc.js.append(f'tl.to("#{sc.chap}>div",{{opacity:0,duration:.35}},{max(s0, t - 0.6):.2f});')
             sc.js.append(f'tl.fromTo("#{hl}",{{opacity:0,scaleX:.6}},{{opacity:1,scaleX:1,duration:.3,ease:"power3.out"}},{t + 0.25:.2f});')
             if prev:
                 sc.js.append(f'tl.to("#{prev}",{{opacity:0,duration:.2}},{t:.2f});')
@@ -724,9 +727,13 @@ def S(sid, W, H):
     return sc
 
 
-def seg_h(c):
+def cell_size(c):
     import struct
-    return struct.unpack(">II", (HERE / f"assets/cells/cell_{c:02d}.png").read_bytes()[16:24])[1]
+    return struct.unpack(">II", (HERE / f"assets/cells/cell_{c:02d}.png").read_bytes()[16:24])
+
+
+def seg_h(c):
+    return cell_size(c)[1]
 
 
 # ---------------------------------------------------------------- captions
@@ -812,6 +819,9 @@ SFX = {"S04": ("whoosh-cinematic", 0.0), "S06": ("whoosh", 0.0), "S12": ("whoosh
        "S23": ("whoosh-cinematic", 0.0), "S26": ("whoosh", 0.0), "S30": ("whoosh-short", 0.0)}
 
 
+EP1_SFX = True   # Episode 1 scene ids have hand-placed effects; later episodes reuse S-ids and turn this off
+
+
 def project(out, W, H, ids, reel=None):
     out.mkdir(parents=True, exist_ok=True)
     (out / "compositions").mkdir(exist_ok=True)
@@ -833,11 +843,11 @@ def project(out, W, H, ids, reel=None):
         if sid in SFX and k > 0:
             name, off = SFX[sid]
             audio.append(f'<audio id="sfx-{sid.lower()}" class="clip" src="assets/sfx/{name}.mp3" data-start="{max(0, t - 0.25 + off):.2f}" data-duration="{SFXLEN[name]}" data-track-index="11" data-volume="0.35"></audio>')
-        if sid == "S24":
+        if EP1_SFX and sid == "S24":
             tf = t + at("S24", "failed")
             audio.append(f'<audio id="sfx-riser" class="clip" src="assets/sfx/riser.mp3" data-start="{max(t, tf - 2.0):.2f}" data-duration="2.0" data-track-index="12" data-volume="0.25"></audio>')
             audio.append(f'<audio id="sfx-impact" class="clip" src="assets/sfx/impact-bass-1.mp3" data-start="{tf + 0.03:.2f}" data-duration="{SFXLEN['impact-bass-1']}" data-track-index="13" data-volume="0.45"></audio>')
-        if sid == "S13":
+        if EP1_SFX and sid == "S13":
             audio.append(f'<audio id="sfx-typing" class="clip" src="assets/sfx/typing.mp3" data-start="{t + 0.3:.2f}" data-duration="{min(SFXLEN['typing'], 6)}" data-track-index="12" data-volume="0.12"></audio>')
         if (sid, W) in TYPING:
             a_, b_ = TYPING[(sid, W)]
